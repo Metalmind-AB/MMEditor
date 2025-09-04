@@ -1,0 +1,191 @@
+/* Mobile-first responsive styles for MMEditor */
+
+/* Mobile styles (default) */
+@media screen and (max-width: 640px) {
+  /* Editor container */
+  .editor-container {
+    min-height: 150px;
+  }
+  
+  /* Toolbar adjustments for mobile */
+  .toolbar {
+    flex-wrap: wrap;
+    padding: 6px;
+    min-height: auto;
+    gap: 4px;
+  }
+  
+  .toolbar-group {
+    gap: 2px;
+  }
+  
+  .toolbar-button {
+    width: 36px;
+    height: 36px;
+    font-size: 18px;
+    /* Larger touch targets for mobile */
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Dropdown adjustments */
+  .dropdown-trigger {
+    min-width: 100px;
+    height: 36px;
+    font-size: 14px;
+  }
+  
+  .dropdown-menu {
+    max-height: 250px;
+    width: auto;
+    min-width: 150px;
+  }
+  
+  /* Dialog adjustments */
+  .link-dialog {
+    width: 90%;
+    max-width: 400px;
+    margin: 10px;
+  }
+  
+  /* Table picker for mobile */
+  .table-picker {
+    transform: scale(1.2);
+    transform-origin: top left;
+  }
+  
+  /* Editor content area */
+  .editor {
+    padding: 8px;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Tables responsive */
+  .editor table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Code blocks responsive */
+  .editor pre,
+  .editor .code-block {
+    padding: 8px;
+    font-size: 14px;
+  }
+}
+
+/* Tablet styles */
+@media screen and (min-width: 641px) and (max-width: 1024px) {
+  .toolbar {
+    padding: 8px;
+  }
+  
+  .toolbar-button {
+    width: 34px;
+    height: 34px;
+  }
+  
+  .editor {
+    padding: 10px;
+  }
+}
+
+/* Desktop styles */
+@media screen and (min-width: 1025px) {
+  /* Default styles already optimized for desktop */
+}
+
+/* Touch device specific styles */
+@media (hover: none) and (pointer: coarse) {
+  /* Enhance touch targets */
+  .toolbar-button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  /* Remove hover effects on touch devices */
+  .toolbar-button:hover {
+    background-color: transparent;
+  }
+  
+  /* Add active state for touch feedback */
+  .toolbar-button:active {
+    background-color: var(--mme-button-active-bg, #d0d0d0);
+    transform: scale(0.95);
+  }
+  
+  /* Improve scrolling */
+  .editor {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Disable text selection on buttons */
+  .toolbar-button {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Landscape orientation adjustments */
+@media screen and (max-width: 812px) and (orientation: landscape) {
+  .toolbar {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  .editor {
+    min-height: calc(50vh - 50px);
+  }
+}
+
+/* Print styles */
+@media print {
+  .toolbar {
+    display: none;
+  }
+  
+  .editor {
+    border: none;
+    padding: 0;
+    min-height: auto;
+  }
+  
+  .editor-container {
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Ensure crisp borders */
+  .editor-container,
+  .toolbar,
+  .toolbar-button {
+    border-width: 0.5px;
+  }
+}
+
+/* Accessibility - Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+  
+  .toolbar-button:active {
+    transform: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  [data-mmeditor-theme="auto"] {
+    /* Auto theme detection handled by ThemeContext */
+  }
+}

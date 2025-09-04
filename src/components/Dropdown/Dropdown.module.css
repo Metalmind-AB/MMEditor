@@ -1,0 +1,126 @@
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  min-width: 100px;
+  height: 32px;
+  border: 1px solid var(--mme-toolbar-border, #ddd);
+  background: var(--mme-background, #fff);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--mme-button-color, #333);
+  transition: background-color 0.2s;
+}
+
+.trigger:hover {
+  background: var(--mme-button-hover-bg, #e0e0e0);
+}
+
+.trigger.open {
+  background: var(--mme-button-active-bg, #d0d0d0);
+}
+
+.triggerText {
+  flex: 1;
+  text-align: left;
+}
+
+.arrow {
+  font-size: 10px;
+  transition: transform 0.2s;
+}
+
+.trigger.open .arrow {
+  transform: rotate(180deg);
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 150px;
+  background: var(--mme-background, #fff);
+  border: 1px solid var(--mme-toolbar-border, #ddd);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  overflow: hidden;
+  animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menuItem {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-size: 14px;
+  color: var(--mme-text-color, #333);
+}
+
+.menuItem:hover {
+  background: var(--mme-button-hover-bg, #e0e0e0);
+}
+
+.menuItem.active {
+  background: var(--mme-button-active-bg, #d0d0d0);
+  color: var(--mme-button-active-color, #0066cc);
+  font-weight: 500;
+}
+
+.menuItem.heading1 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.menuItem.heading2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.menuItem.heading3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.menuItem.heading4 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.menuItem.heading5 {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.menuItem.heading6 {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.divider {
+  height: 1px;
+  background: var(--mme-toolbar-border, #ddd);
+  margin: 4px 0;
+}

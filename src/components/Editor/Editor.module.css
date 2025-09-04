@@ -1,0 +1,161 @@
+.container {
+  border: 1px solid var(--mme-border-color, #ddd);
+  border-radius: var(--mme-border-radius, 4px);
+  background: var(--mme-background, #fff);
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.editor {
+  flex: 1;
+  padding: 12px;
+  outline: none;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: 1.6;
+  color: var(--mme-text-color, #333);
+  min-height: 150px;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
+}
+
+.editor:focus {
+  outline: none;
+}
+
+.editor::selection {
+  background-color: var(--mme-selection-bg, #b4d5fe);
+  color: inherit;
+}
+
+.editor ::-moz-selection {
+  background-color: var(--mme-selection-bg, #b4d5fe);
+  color: inherit;
+}
+
+.editor *::selection {
+  background-color: var(--mme-selection-bg, #b4d5fe);
+  color: inherit;
+}
+
+.editor *::-moz-selection {
+  background-color: var(--mme-selection-bg, #b4d5fe);
+  color: inherit;
+}
+
+.editor:empty:before {
+  content: attr(data-placeholder);
+  color: var(--mme-placeholder-color, #999);
+  pointer-events: none;
+  position: absolute;
+}
+
+.editor.readOnly {
+  cursor: default;
+  background: var(--mme-readonly-bg, #f5f5f5);
+}
+
+.editor h1,
+.editor h2,
+.editor h3,
+.editor h4,
+.editor h5,
+.editor h6 {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  font-weight: 600;
+}
+
+.editor h1 { font-size: 2em; }
+.editor h2 { font-size: 1.5em; }
+.editor h3 { font-size: 1.17em; }
+.editor h4 { font-size: 1em; }
+.editor h5 { font-size: 0.83em; }
+.editor h6 { font-size: 0.67em; }
+
+.editor p {
+  margin-top: 0;
+  margin-bottom: 1em;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.editor ul,
+.editor ol {
+  padding-left: 1.5em;
+  margin: 0.5em 0;
+}
+
+.editor li {
+  margin: 0.25em 0;
+}
+
+.editor a {
+  color: var(--mme-link-color, #0066cc);
+  text-decoration: underline;
+}
+
+.editor a:hover {
+  color: var(--mme-link-hover-color, #0052a3);
+}
+
+.editor code {
+  background: var(--mme-code-bg, #f5f5f5);
+  color: var(--mme-code-color, #d14);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+}
+
+.editor pre,
+.editor .code-block {
+  background: var(--mme-codeblock-bg, #f8f8f8);
+  border: 1px solid var(--mme-border-color, #ddd);
+  border-radius: 3px;
+  padding: 1em;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+  tab-size: 4;
+}
+
+.editor pre code,
+.editor .code-block code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+}
+
+.editor pre *,
+.editor .code-block * {
+  color: var(--mme-codeblock-color, #333);
+  background: transparent;
+  font-weight: normal;
+  font-style: normal;
+  text-decoration: none;
+}
+
+.editor table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1em 0;
+}
+
+.editor th,
+.editor td {
+  border: 1px solid var(--mme-table-border, #ddd);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.editor th {
+  background: var(--mme-table-header-bg, #f5f5f5);
+  font-weight: 600;
+}

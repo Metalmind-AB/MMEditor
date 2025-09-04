@@ -1,0 +1,50 @@
+.picker {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--mme-background, #fff);
+  border: 1px solid var(--mme-border-color, #ddd);
+  border-radius: var(--mme-border-radius, 4px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  z-index: 1000;
+  margin-top: 4px;
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  gap: 2px;
+}
+
+.cell {
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--mme-border-color, #ddd);
+  background: var(--mme-background, #fff);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.cell:hover {
+  border-color: var(--mme-button-active-color, #0066cc);
+}
+
+.cell.active {
+  background: var(--mme-button-active-bg, #e3f2fd);
+  border-color: var(--mme-button-active-color, #0066cc);
+}
+
+.label {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--mme-border-color, #ddd);
+  text-align: center;
+  font-size: 12px;
+  color: var(--mme-text-color, #333);
+}
