@@ -24,6 +24,8 @@
     "build": "vite build && npm run build:types",
     "build:types": "tsc --project tsconfig.build.json",
     "prebuild": "rm -rf dist",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm run build",
     "preview": "vite preview",
     "test": "vitest",
     "test:unit": "vitest run",
