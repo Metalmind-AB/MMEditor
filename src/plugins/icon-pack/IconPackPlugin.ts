@@ -113,7 +113,7 @@ export class IconPackPlugin implements Plugin {
     // This will cause the toolbar to re-read icon overrides
     import('../../plugins/PluginRegistry').then(({ pluginRegistry }) => {
       // Access private method to notify changes
-      (pluginRegistry as any).notifyChange?.();
+      (pluginRegistry as unknown as { notifyChange?: () => void }).notifyChange?.();
     });
   }
   
