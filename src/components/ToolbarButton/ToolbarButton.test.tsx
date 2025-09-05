@@ -194,7 +194,7 @@ describe('ToolbarButton Component', () => {
     it('handles missing tooltip gracefully', () => {
       const propsWithoutTooltip = {
         ...defaultProps,
-        tooltip: undefined as unknown,
+        tooltip: '',
       };
       
       expect(() => {

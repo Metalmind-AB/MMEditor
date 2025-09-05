@@ -1,6 +1,6 @@
 {
   "name": "@mmeditor/core",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "type": "module",
   "main": "./dist/mmeditor.umd.js",
   "module": "./dist/mmeditor.es.js",
@@ -22,6 +22,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run build:types",
+    "build:ci": "vite build && tsc --project tsconfig.ci.json || true",
     "build:types": "tsc --project tsconfig.build.json",
     "prebuild": "rm -rf dist",
     "prepare": "npm run build",

@@ -27,6 +27,7 @@ export interface PluginToolbarItem {
   isActive?: (editor: EditorInstance) => boolean;
   position?: 'start' | 'end' | number;
   group?: string;
+  pluginName?: string;
 }
 
 /**

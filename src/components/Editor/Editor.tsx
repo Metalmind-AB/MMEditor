@@ -148,7 +148,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     }, []);
 
     // We need to use a ref to avoid circular dependency issues
-    const handleLinkFormatRef = useRef<() => void>();
+    const handleLinkFormatRef = useRef<(() => void) | undefined>(undefined);
     
     const format = useCallback((formatName: string, _value?: unknown): void => {
       switch (formatName) {
@@ -341,7 +341,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
 
     // Debounce onChange to improve performance
     const debouncedOnChange = useDebounce(
-      (html: string) => onChange?.(html),
+      (...args: unknown[]) => {
+        const html = args[0] as string;
+        onChange?.(html);
+      },
       300
     );
 

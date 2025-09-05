@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '../../test/test-utils';
 import { securityUtils } from '../../test/test-utils';
 import { Editor } from '../../components/Editor/Editor';
@@ -190,10 +190,10 @@ describe('XSS Prevention Tests', () => {
         getData: vi.fn(() => '<script>alert("paste-xss")</script><p>Pasted</p>')
       };
       
-      const pasteEvent = new Event('paste') as unknown;
-      pasteEvent.clipboardData = clipboardData;
+      const pasteEvent = new Event('paste') as ClipboardEvent;
+      (pasteEvent as any).clipboardData = clipboardData;
       
-      fireEvent(editor, pasteEvent);
+      fireEvent(editor, pasteEvent as Event);
       
       expect(editor.innerHTML).not.toContain('<script>');
     });

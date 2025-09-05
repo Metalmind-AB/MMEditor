@@ -8,7 +8,7 @@ import { EditorInstance } from '../../components/Editor/Editor.types';
 /**
  * Configuration interface for your plugin
  */
-export interface PluginTemplateConfig {
+export interface PluginTemplateConfig extends Record<string, unknown> {
   // Add your configuration options here
   enabled?: boolean;
   apiEndpoint?: string;

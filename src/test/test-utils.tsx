@@ -1,6 +1,7 @@
 import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { vi } from 'vitest';
 
 // Custom render function that includes providers if needed in the future
 const customRender = (
@@ -78,7 +79,7 @@ export const performanceUtils = {
    */
   getMemoryUsage: () => {
     if ('memory' in performance) {
-      return (performance as unknown).memory.usedJSHeapSize;
+      return (performance as any).memory.usedJSHeapSize;
     }
     return 0;
   },
@@ -188,8 +189,26 @@ export const mockUtils = {
       getRangeAt: vi.fn(),
       removeAllRanges: vi.fn(),
       addRange: vi.fn(),
+      anchorNode: null,
+      anchorOffset: 0,
+      direction: 'none' as const,
+      focusNode: null,
+      focusOffset: 0,
+      isCollapsed: true,
+      type: 'None' as const,
+      collapse: vi.fn(),
+      collapseToEnd: vi.fn(),
+      collapseToStart: vi.fn(),
+      containsNode: vi.fn(() => false),
+      deleteFromDocument: vi.fn(),
+      empty: vi.fn(),
+      extend: vi.fn(),
+      modify: vi.fn(),
+      selectAllChildren: vi.fn(),
+      setBaseAndExtent: vi.fn(),
+      setPosition: vi.fn(),
       toString: vi.fn(() => ''),
-    };
+    } as unknown as Selection;
     window.getSelection = vi.fn(() => mock);
     return mock;
   },

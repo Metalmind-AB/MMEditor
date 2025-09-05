@@ -98,21 +98,22 @@ describe('MMEditor', () => {
   });
 
   it('exposes editor methods via ref', () => {
-    let editorRef: React.RefObject<EditorInstance> | null = null;
-    
     const TestComponent = () => {
-      editorRef = useRef<EditorInstance>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
+      
+      React.useEffect(() => {
+        expect(editorRef.current).toBeDefined();
+        expect(editorRef.current?.getHTML).toBeDefined();
+        expect(editorRef.current?.setHTML).toBeDefined();
+        expect(editorRef.current?.format).toBeDefined();
+        expect(editorRef.current?.focus).toBeDefined();
+        expect(editorRef.current?.blur).toBeDefined();
+      });
+      
       return <Editor ref={editorRef} />;
     };
     
     render(<TestComponent />);
-    
-    expect(editorRef?.current).toBeDefined();
-    expect(editorRef?.current?.getHTML).toBeDefined();
-    expect(editorRef?.current?.setHTML).toBeDefined();
-    expect(editorRef?.current?.format).toBeDefined();
-    expect(editorRef?.current?.focus).toBeDefined();
-    expect(editorRef?.current?.blur).toBeDefined();
   });
 
   it('calls onReady when component mounts', () => {
@@ -154,12 +155,12 @@ describe('MMEditor Link Functionality', () => {
   it('covers link format handling workflow', () => {
     // This test covers the link format functions without complex DOM interaction
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
           // Test that format method handles 'link' case
-          expect(() => editorRef.current.format('link')).not.toThrow();
+          expect(() => editorRef.current!.format('link')).not.toThrow();
         }
       }, []);
       
@@ -215,7 +216,7 @@ describe('MMEditor Context Menu', () => {
 describe('MMEditor Selection Management', () => {
   it('saves and restores selection', () => {
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         // Test selection save/restore through private methods
@@ -252,10 +253,10 @@ describe('MMEditor Plugin System', () => {
 
   it('handles plugin commands', () => {
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
-        if (editorRef.current && editorRef.current.executeCommand) {
+        if (editorRef.current) {
           // Test executeCommand method
           editorRef.current.executeCommand('nonexistent-command');
         }
@@ -318,7 +319,7 @@ describe('MMEditor Format Detection', () => {
     });
     
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -343,7 +344,7 @@ describe('MMEditor Format Detection', () => {
     });
     
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -363,7 +364,7 @@ describe('MMEditor Format Detection', () => {
 describe('MMEditor Text Operations', () => {
   it('gets and sets text content', async () => {
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       const [mounted, setMounted] = React.useState(false);
       
       React.useEffect(() => {
@@ -391,12 +392,12 @@ describe('MMEditor Text Operations', () => {
     const mockSelection = {
       rangeCount: 0,
       removeAllRanges: vi.fn()
-    } as unknown;
+    } as unknown as Selection;
     
     vi.mocked(window.getSelection).mockReturnValue(mockSelection);
     
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -404,7 +405,7 @@ describe('MMEditor Text Operations', () => {
           expect(selection).toBeNull(); // No selection initially
           
           // Test setSelection - should not throw
-          expect(() => editorRef.current.setSelection({ index: 0, length: 0 })).not.toThrow();
+          expect(() => editorRef.current!.setSelection({ index: 0, length: 0 })).not.toThrow();
         }
       }, []);
       
@@ -420,20 +421,20 @@ describe('MMEditor Text Operations', () => {
 describe('MMEditor Additional Coverage', () => {
   it('covers format method edge cases', () => {
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
           // Test all format cases
-          expect(() => editorRef.current.format('h4')).not.toThrow();
-          expect(() => editorRef.current.format('h5')).not.toThrow();
-          expect(() => editorRef.current.format('h6')).not.toThrow();
-          expect(() => editorRef.current.format('code-block')).not.toThrow();
-          expect(() => editorRef.current.format('clear')).not.toThrow();
-          expect(() => editorRef.current.format('unknown')).not.toThrow();
+          expect(() => editorRef.current!.format('h4')).not.toThrow();
+          expect(() => editorRef.current!.format('h5')).not.toThrow();
+          expect(() => editorRef.current!.format('h6')).not.toThrow();
+          expect(() => editorRef.current!.format('code-block')).not.toThrow();
+          expect(() => editorRef.current!.format('clear')).not.toThrow();
+          expect(() => editorRef.current!.format('unknown')).not.toThrow();
           
           // Test removeFormat
-          expect(() => editorRef.current.removeFormat()).not.toThrow();
+          expect(() => editorRef.current!.removeFormat()).not.toThrow();
         }
       }, []);
       
@@ -468,15 +469,13 @@ describe('MMEditor Additional Coverage', () => {
 
   it('covers beforeChange and afterChange plugin hooks', () => {
     const TestComponent = () => {
-      const editorRef = useRef<unknown>(null);
+      const editorRef = useRef<EditorInstance | null>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
           // Trigger input change to activate plugin hooks
           const editor = editorRef.current;
-          if (editor.setHTML && editor.getHTML) {
-            editor.setHTML('<p>Test content change</p>');
-          }
+          editor.setHTML('<p>Test content change</p>');
         }
       }, []);
       

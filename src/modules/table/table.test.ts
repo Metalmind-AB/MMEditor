@@ -1,6 +1,15 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { TableManager } from './table';
 
+// Mock window.getSelection and document.createRange at the module level
+vi.stubGlobal('getSelection', vi.fn());
+vi.stubGlobal('document', {
+  ...document,
+  createRange: vi.fn(),
+  createElement: document.createElement.bind(document),
+  createTextNode: document.createTextNode.bind(document)
+});
+
 describe('TableManager', () => {
   // Mock DOM elements and methods
   let mockTable: HTMLTableElement;
@@ -14,13 +23,13 @@ describe('TableManager', () => {
   function createMockCell(tagName: string = 'TD', cellIndex: number = 0): HTMLTableCellElement {
     const cell = document.createElement(tagName.toLowerCase() as 'td' | 'th');
     // Use a custom property to track cellIndex since the real one is read-only
-    (cell as unknown).__mockCellIndex = cellIndex;
+    (cell as any).__mockCellIndex = cellIndex;
     Object.defineProperty(cell, 'cellIndex', {
-      get() { return (this as unknown).__mockCellIndex; },
-      set(value) { (this as unknown).__mockCellIndex = value; },
+      get() { return (this as any).__mockCellIndex; },
+      set(value) { (this as any).__mockCellIndex = value; },
       configurable: true
     });
-    return cell as HTMLTableCellElement;
+    return cell;
   }
 
   // Helper to create mock table rows
@@ -29,10 +38,10 @@ describe('TableManager', () => {
     cells.forEach(cell => row.appendChild(cell));
     
     // Use a custom property to track rowIndex since the real one is read-only
-    (row as unknown).__mockRowIndex = rowIndex;
+    (row as any).__mockRowIndex = rowIndex;
     Object.defineProperty(row, 'rowIndex', {
-      get() { return (this as unknown).__mockRowIndex; },
-      set(value) { (this as unknown).__mockRowIndex = value; },
+      get() { return (this as any).__mockRowIndex; },
+      set(value) { (this as any).__mockRowIndex = value; },
       configurable: true
     });
     
@@ -55,22 +64,24 @@ describe('TableManager', () => {
       setEnd: vi.fn(),
       selectNodeContents: vi.fn(),
       collapse: vi.fn(),
-    } as unknown;
+    } as any as Range;
 
     // Create mock selection
     mockSelection = {
-      rangeCount: 1,
-      anchorNode: null,
       getRangeAt: vi.fn(() => mockRange),
       removeAllRanges: vi.fn(),
       addRange: vi.fn(),
-    } as unknown;
-
-    // Mock window.getSelection
-    vi.mocked(window.getSelection).mockReturnValue(mockSelection);
+    } as any as Selection;
     
-    // Mock document.createRange
-    vi.mocked(document.createRange).mockReturnValue(mockRange);
+    // Set read-only properties using Object.defineProperty
+    Object.defineProperty(mockSelection, 'rangeCount', { value: 1, writable: true, configurable: true });
+    Object.defineProperty(mockSelection, 'anchorNode', { value: null, writable: true, configurable: true });
+
+    // Mock window.getSelection with proper typing
+    vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection);
+    
+    // Mock document.createRange with proper typing
+    vi.spyOn(document, 'createRange').mockReturnValue(mockRange);
 
     // Create fresh DOM structure for each test
     resetTableStructure();
@@ -102,13 +113,23 @@ describe('TableManager', () => {
     });
 
     // Set anchor node for selection
-    mockSelection.anchorNode = mockCell;
+    Object.defineProperty(mockSelection, 'anchorNode', { value: mockCell, writable: true, configurable: true });
 
     // Mock querySelector methods
     mockTable.querySelectorAll = vi.fn((selector) => {
-      if (selector === 'tr') return [mockRow] as unknown;
-      if (selector === 'td, th') return [mockCell] as unknown;
-      return [] as unknown;
+      if (selector === 'tr') {
+        const nodeList: Element[] = [mockRow];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      }
+      if (selector === 'td, th') {
+        const nodeList: Element[] = [mockCell];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      }
+      const nodeList: Element[] = [];
+      (nodeList as any).item = (index: number) => nodeList[index] || null;
+      return nodeList as unknown as NodeListOf<Element>;
     });
 
     mockTable.querySelector = vi.fn((selector) => {
@@ -117,8 +138,14 @@ describe('TableManager', () => {
     });
 
     mockTbody.querySelectorAll = vi.fn((selector) => {
-      if (selector === 'tr') return [mockRow] as unknown;
-      return [] as unknown;
+      if (selector === 'tr') {
+        const nodeList: Element[] = [mockRow];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      }
+      const nodeList: Element[] = [];
+      (nodeList as any).item = (index: number) => nodeList[index] || null;
+      return nodeList as unknown as NodeListOf<Element>;
     });
 
     mockTbody.querySelector = vi.fn((selector) => {
@@ -134,13 +161,13 @@ describe('TableManager', () => {
 
     it('returns true when selection is inside a table header', () => {
       const mockTh = createMockCell('TH');
-      mockSelection.anchorNode = mockTh;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockTh, writable: true, configurable: true });
       
       expect(TableManager.isInTable()).toBe(true);
     });
 
     it('returns true when selection is inside a table element', () => {
-      mockSelection.anchorNode = mockTable;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockTable, writable: true, configurable: true });
       
       expect(TableManager.isInTable()).toBe(true);
     });
@@ -152,7 +179,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when selection has no ranges', () => {
-      mockSelection.rangeCount = 0;
+      Object.defineProperty(mockSelection, 'rangeCount', { value: 0, writable: true, configurable: true });
       
       expect(TableManager.isInTable()).toBe(false);
     });
@@ -160,7 +187,7 @@ describe('TableManager', () => {
     it('returns false when selection is outside a table', () => {
       const mockDiv = document.createElement('div');
       Object.defineProperty(mockDiv, 'parentNode', { value: null, configurable: true });
-      mockSelection.anchorNode = mockDiv;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockDiv, writable: true, configurable: true });
       
       expect(TableManager.isInTable()).toBe(false);
     });
@@ -168,7 +195,7 @@ describe('TableManager', () => {
     it('traverses DOM tree to find table elements', () => {
       const mockSpan = document.createElement('span');
       Object.defineProperty(mockSpan, 'parentNode', { value: mockCell, configurable: true });
-      mockSelection.anchorNode = mockSpan;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockSpan, writable: true, configurable: true });
       
       expect(TableManager.isInTable()).toBe(true);
     });
@@ -182,7 +209,7 @@ describe('TableManager', () => {
 
     it('returns current TH cell when selection is inside header', () => {
       const mockTh = createMockCell('TH');
-      mockSelection.anchorNode = mockTh;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockTh, writable: true, configurable: true });
       
       const result = TableManager.getCurrentCell();
       expect(result).toBe(mockTh);
@@ -196,7 +223,7 @@ describe('TableManager', () => {
     });
 
     it('returns null when selection has no ranges', () => {
-      mockSelection.rangeCount = 0;
+      Object.defineProperty(mockSelection, 'rangeCount', { value: 0, writable: true, configurable: true });
       
       const result = TableManager.getCurrentCell();
       expect(result).toBeNull();
@@ -205,7 +232,7 @@ describe('TableManager', () => {
     it('returns null when selection is outside table cells', () => {
       const mockDiv = document.createElement('div');
       Object.defineProperty(mockDiv, 'parentNode', { value: null, configurable: true });
-      mockSelection.anchorNode = mockDiv;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockDiv, writable: true, configurable: true });
       
       const result = TableManager.getCurrentCell();
       expect(result).toBeNull();
@@ -214,7 +241,7 @@ describe('TableManager', () => {
     it('traverses DOM tree to find table cells', () => {
       const mockSpan = document.createElement('span');
       Object.defineProperty(mockSpan, 'parentNode', { value: mockCell, configurable: true });
-      mockSelection.anchorNode = mockSpan;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockSpan, writable: true, configurable: true });
       
       const result = TableManager.getCurrentCell();
       expect(result).toBe(mockCell);
@@ -310,11 +337,8 @@ describe('TableManager', () => {
     let mockEvent: KeyboardEvent;
     
     beforeEach(() => {
-      mockEvent = {
-        preventDefault: vi.fn(),
-        shiftKey: false,
-        key: 'Tab'
-      } as unknown;
+      mockEvent = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: false });
+      Object.defineProperty(mockEvent, 'preventDefault', { value: vi.fn(), writable: true });
       
       // Mock TableManager methods
       vi.spyOn(TableManager, 'isInTable').mockReturnValue(true);
@@ -354,8 +378,10 @@ describe('TableManager', () => {
 
     it('navigates to next cell on Tab', () => {
       const nextCell = createMockCell('TD', 1);
-      mockCell.cellIndex = 0;
-      mockTable.querySelectorAll = vi.fn(() => [mockCell, nextCell] as unknown);
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
+      const nodeList: Element[] = [mockCell, nextCell];
+      (nodeList as any).item = (index: number) => nodeList[index] || null;
+      mockTable.querySelectorAll = vi.fn(() => nodeList as unknown as NodeListOf<Element>);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -366,9 +392,11 @@ describe('TableManager', () => {
 
     it('navigates to previous cell on Shift+Tab', () => {
       const prevCell = createMockCell('TD', 0);
-      mockEvent.shiftKey = true;
-      mockCell.cellIndex = 1;
-      mockTable.querySelectorAll = vi.fn(() => [prevCell, mockCell] as unknown);
+      Object.defineProperty(mockEvent, 'shiftKey', { value: true, writable: true, configurable: true });
+      Object.defineProperty(mockCell, 'cellIndex', { value: 1, writable: true, configurable: true });
+      const nodeList2: Element[] = [prevCell, mockCell];
+      (nodeList2 as any).item = (index: number) => nodeList2[index] || null;
+      mockTable.querySelectorAll = vi.fn(() => nodeList2 as unknown as NodeListOf<Element>);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -378,8 +406,10 @@ describe('TableManager', () => {
     });
 
     it('adds new row when Tab pressed on last cell', () => {
-      mockCell.cellIndex = 0;
-      mockTable.querySelectorAll = vi.fn(() => [mockCell] as unknown);
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
+      const nodeList3: Element[] = [mockCell];
+      (nodeList3 as any).item = (index: number) => nodeList3[index] || null;
+      mockTable.querySelectorAll = vi.fn(() => nodeList3 as unknown as NodeListOf<Element>);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -433,7 +463,7 @@ describe('TableManager', () => {
   describe('addRowBelow', () => {
     beforeEach(() => {
       // Set up selection to point to mockCell
-      mockSelection.anchorNode = mockCell;
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockCell, writable: true, configurable: true });
       vi.spyOn(TableManager, 'focusCell').mockImplementation(vi.fn());
     });
 
@@ -502,7 +532,7 @@ describe('TableManager', () => {
       mockRow.insertBefore = insertBefore;
       
       // Set up cellIndex correctly - the algorithm looks for cells[cellIndex]
-      mockCell.cellIndex = 0;
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
       
       // Make sure cells array is properly set up with the right index
       Object.defineProperty(mockRow, 'cells', {
@@ -544,7 +574,7 @@ describe('TableManager', () => {
     it('appends column when current cell is last', () => {
       const appendChild = vi.fn();
       mockRow.appendChild = appendChild;
-      mockCell.cellIndex = 0;
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
       
       TableManager.addColumnRight();
       
@@ -580,7 +610,7 @@ describe('TableManager', () => {
         configurable: true
       });
       
-      mockRow.rowIndex = 0;
+      Object.defineProperty(mockRow, 'rowIndex', { value: 0, writable: true, configurable: true });
       const remove = vi.fn();
       mockRow.remove = remove;
       
@@ -626,11 +656,15 @@ describe('TableManager', () => {
       const cell2 = createMockCell('TD', 1);
       const newRow = createMockRow([mockCell, cell2]);
       
-      mockCell.cellIndex = 0;
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
       const remove = vi.fn();
       mockCell.remove = remove;
       
-      mockTable.querySelectorAll = vi.fn(() => [newRow] as unknown);
+      mockTable.querySelectorAll = vi.fn(() => {
+        const nodeList = [newRow];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      });
       
       TableManager.deleteColumn();
       
@@ -643,7 +677,11 @@ describe('TableManager', () => {
       const remove = vi.fn();
       mockCell.remove = remove;
       
-      mockTable.querySelectorAll = vi.fn(() => [newRow] as unknown);
+      mockTable.querySelectorAll = vi.fn(() => {
+        const nodeList = [newRow];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      });
       
       TableManager.deleteColumn();
       
@@ -666,10 +704,8 @@ describe('TableManager', () => {
     let mockEvent: KeyboardEvent;
     
     beforeEach(() => {
-      mockEvent = {
-        key: 'ArrowDown',
-        preventDefault: vi.fn()
-      } as unknown;
+      mockEvent = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+      Object.defineProperty(mockEvent, 'preventDefault', { value: vi.fn(), writable: true });
       
       vi.spyOn(TableManager, 'isInTable').mockReturnValue(true);
       vi.spyOn(TableManager, 'getCurrentCell').mockReturnValue(mockCell);
@@ -703,8 +739,8 @@ describe('TableManager', () => {
         configurable: true
       });
       
-      mockCell.cellIndex = 0;
-      mockEvent.key = 'ArrowRight';
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, configurable: true });
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowRight', configurable: true });
       
       const result = TableManager.handleArrowKeyInTable(mockEvent);
       
@@ -715,8 +751,8 @@ describe('TableManager', () => {
 
     it('returns false for right arrow at last cell', () => {
       createMockRow([mockCell]);
-      mockCell.cellIndex = 0;
-      mockEvent.key = 'ArrowRight';
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, writable: true, configurable: true });
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowRight', writable: true, configurable: true });
       
       const result = TableManager.handleArrowKeyInTable(mockEvent);
       
@@ -734,17 +770,18 @@ describe('TableManager', () => {
     
     beforeEach(() => {
       mockEvent = {
-        key: 'ArrowDown',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
+      
+      // Set read-only properties using Object.defineProperty
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       mockElement = document.createElement('p');
       
-      const mockRange = {
-        commonAncestorContainer: mockElement
-      };
+      const mockRange = {} as Range;
+      Object.defineProperty(mockRange, 'commonAncestorContainer', { value: mockElement, configurable: true });
       
-      mockSelection.getRangeAt = vi.fn(() => mockRange as unknown);
+      mockSelection.getRangeAt = vi.fn(() => mockRange);
       vi.spyOn(TableManager, 'focusCell').mockImplementation(vi.fn());
     });
 
@@ -757,7 +794,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when selection has no ranges', () => {
-      mockSelection.rangeCount = 0;
+      Object.defineProperty(mockSelection, 'rangeCount', { value: 0, configurable: true });
       
       const result = TableManager.handleArrowKeyToEnterTable(mockEvent);
       
@@ -785,7 +822,7 @@ describe('TableManager', () => {
     });
 
     it('returns false for non-arrow keys', () => {
-      mockEvent.key = 'Enter';
+      Object.defineProperty(mockEvent, 'key', { value: 'Enter', configurable: true });
       Object.defineProperty(mockElement, 'nextElementSibling', { value: mockTable, configurable: true });
       
       const result = TableManager.handleArrowKeyToEnterTable(mockEvent);
@@ -832,19 +869,19 @@ describe('TableManager', () => {
     it('handles keyboard events with missing properties', () => {
       const incompleteEvent = {
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
       
       // These should handle incomplete events gracefully
       expect(() => TableManager.handleTabInTable(incompleteEvent)).not.toThrow();
       expect(() => TableManager.handleArrowKeyInTable(incompleteEvent)).not.toThrow();
       
       // For handleArrowKeyToEnterTable, we need to provide a selection that won't cause errors
-      const originalGetSelection = vi.mocked(window.getSelection);
-      vi.mocked(window.getSelection).mockReturnValue(null);
+      const originalGetSelection = vi.spyOn(window, 'getSelection');
+      vi.spyOn(window, 'getSelection').mockReturnValue(null);
       expect(() => TableManager.handleArrowKeyToEnterTable(incompleteEvent)).not.toThrow();
       
       // Restore the original mock
-      vi.mocked(window.getSelection).mockImplementation(originalGetSelection);
+      originalGetSelection.mockRestore();
     });
   });
 
@@ -853,24 +890,25 @@ describe('TableManager', () => {
 
     beforeEach(() => {
       mockEvent = {
-        key: 'ArrowUp',
         shiftKey: false,
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
       
-      mockSelection.anchorNode = mockCell;
-      vi.mocked(window.getSelection).mockReturnValue(mockSelection);
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowUp', configurable: true });
+      
+      Object.defineProperty(mockSelection, 'anchorNode', { value: mockCell, configurable: true });
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection);
     });
 
     it('handles shouldExitTable scenario in handleArrowKeyInTable', () => {
       // Set up a scenario where we're at the edge of the table and should exit
-      mockEvent.key = 'ArrowUp';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowUp', configurable: true });
       Object.defineProperty(mockCell, 'parentElement', {
         value: mockRow,
         configurable: true
       });
-      mockRow.rowIndex = 0; // First row
-      mockCell.cellIndex = 0;
+      Object.defineProperty(mockRow, 'rowIndex', { value: 0, configurable: true }); // First row
+      Object.defineProperty(mockCell, 'cellIndex', { value: 0, configurable: true });
       
       // Mock the table structure - single row, single cell
       mockTable.querySelector = vi.fn((selector) => {
@@ -878,7 +916,11 @@ describe('TableManager', () => {
         return null;
       });
       
-      mockTbody.querySelectorAll = vi.fn(() => [mockRow] as unknown);
+      mockTbody.querySelectorAll = vi.fn(() => {
+        const nodeList: Element[] = [mockRow];
+        (nodeList as any).item = (index: number) => nodeList[index] || null;
+        return nodeList as unknown as NodeListOf<Element>;
+      });
       Object.defineProperty(mockRow, 'cells', {
         value: [mockCell],
         configurable: true
@@ -898,18 +940,19 @@ describe('TableManager', () => {
 
     beforeEach(() => {
       mockEvent = {
-        key: 'ArrowDown',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
+      
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       mockElement = document.createElement('p');
       mockTable = document.createElement('table');
       
       // Mock selection
-      mockRange.commonAncestorContainer = mockElement;
+      Object.defineProperty(mockRange, 'commonAncestorContainer', { value: mockElement, configurable: true });
       mockSelection.getRangeAt = vi.fn(() => mockRange);
-      mockSelection.rangeCount = 1;
-      vi.mocked(window.getSelection).mockReturnValue(mockSelection);
+      Object.defineProperty(mockSelection, 'rangeCount', { value: 1, configurable: true });
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection);
       
       vi.spyOn(TableManager, 'focusCell').mockImplementation(vi.fn());
     });
@@ -919,7 +962,7 @@ describe('TableManager', () => {
     });
 
     it('enters table from top with ArrowDown', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       // Set up next sibling as table
       Object.defineProperty(mockElement, 'nextElementSibling', {
@@ -944,7 +987,7 @@ describe('TableManager', () => {
     });
 
     it('enters table from bottom with ArrowUp', () => {
-      mockEvent.key = 'ArrowUp';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowUp', configurable: true });
       
       // Set up previous sibling as table
       Object.defineProperty(mockElement, 'previousElementSibling', {
@@ -974,7 +1017,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when no adjacent table exists', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       // No next sibling
       Object.defineProperty(mockElement, 'nextElementSibling', {
@@ -989,7 +1032,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when adjacent element is not a table', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       // Next sibling is a div, not a table
       const div = document.createElement('div');
@@ -1005,7 +1048,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when table has no rows', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       // Empty table
       Object.defineProperty(mockElement, 'nextElementSibling', {
@@ -1020,7 +1063,7 @@ describe('TableManager', () => {
     });
 
     it('handles table without tbody', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       Object.defineProperty(mockElement, 'nextElementSibling', {
         value: mockTable,
@@ -1050,7 +1093,7 @@ describe('TableManager', () => {
     });
 
     it('returns false when range is unavailable', () => {
-      mockSelection.rangeCount = 0;
+      Object.defineProperty(mockSelection, 'rangeCount', { value: 0, configurable: true });
       
       const result = TableManager.handleArrowKeyToEnterTable(mockEvent);
       
@@ -1058,14 +1101,14 @@ describe('TableManager', () => {
     });
 
     it('handles text node as commonAncestorContainer', () => {
-      mockEvent.key = 'ArrowDown';
+      Object.defineProperty(mockEvent, 'key', { value: 'ArrowDown', configurable: true });
       
       // Create text node with parent element
       const textNode = document.createTextNode('text');
       const parentElement = document.createElement('p');
       parentElement.appendChild(textNode);
       
-      mockRange.commonAncestorContainer = textNode;
+      Object.defineProperty(mockRange, 'commonAncestorContainer', { value: textNode, configurable: true });
       
       Object.defineProperty(parentElement, 'nextElementSibling', {
         value: mockTable,

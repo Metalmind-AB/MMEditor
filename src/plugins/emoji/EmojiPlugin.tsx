@@ -21,9 +21,8 @@ export class EmojiPlugin implements Plugin {
 
   toolbarItems: PluginToolbarItem[] = [
     {
-      id: 'emoji',
-      type: 'button',
-      title: 'Insert Emoji',
+      name: 'emoji',
+      tooltip: 'Insert Emoji',
       icon: '😀',
       action: (editor: EditorInstance) => {
         this.showEmojiPicker(editor);
@@ -35,7 +34,8 @@ export class EmojiPlugin implements Plugin {
   commands = [
     {
       name: 'insertEmoji',
-      execute: (editor: EditorInstance, emoji: string) => {
+      execute: (editor: EditorInstance, ...args: unknown[]) => {
+        const emoji = args[0] as string;
         this.insertEmoji(editor, emoji);
       },
       canExecute: () => true,

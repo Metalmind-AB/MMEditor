@@ -25,7 +25,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockCodeElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = CodeManager.isInInlineCode();
       expect(result).toBe(true);
@@ -40,7 +40,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = CodeManager.isInInlineCode();
       expect(result).toBe(false);
@@ -56,14 +56,14 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockCodeInPre,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = CodeManager.isInInlineCode();
       expect(result).toBe(false);
     });
 
     it('handles no selection', () => {
-      window.getSelection = vi.fn(() => null as unknown);
+      window.getSelection = vi.fn(() => null as unknown as Selection | null);
 
       const result = CodeManager.isInInlineCode();
       expect(result).toBe(false);
@@ -82,7 +82,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockTextNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = CodeManager.isInInlineCode();
       expect(result).toBe(true);
@@ -92,17 +92,17 @@ describe('CodeManager', () => {
   describe('Inline Code Toggling', () => {
     beforeEach(() => {
       // Mock document.createElement and other DOM methods
-      document.createElement = vi.fn((tagName) => ({
+      document.createElement = vi.fn((tagName: string) => ({
         tagName,
         textContent: '',
         setAttribute: vi.fn(),
         getAttribute: vi.fn(),
-      })) as unknown;
+      })) as unknown as typeof document.createElement;
 
-      document.createTextNode = vi.fn((text) => ({
+      document.createTextNode = vi.fn((text: string) => ({
         nodeType: Node.TEXT_NODE,
         textContent: text,
-      })) as unknown;
+      })) as unknown as typeof document.createTextNode;
 
       document.createRange = vi.fn(() => ({
         deleteContents: vi.fn(),
@@ -110,7 +110,7 @@ describe('CodeManager', () => {
         selectNodeContents: vi.fn(),
         setStart: vi.fn(),
         setEnd: vi.fn(),
-      })) as unknown;
+      })) as unknown as typeof document.createRange;
     });
 
     it('removes code formatting when already in code', () => {
@@ -135,7 +135,7 @@ describe('CodeManager', () => {
         getRangeAt: vi.fn(() => mockRange),
         removeAllRanges: vi.fn(),
         addRange: vi.fn(),
-      } as unknown));
+      } as unknown as Selection));
 
       // Mock the isInInlineCode to return true initially
       CodeManager.isInInlineCode = vi.fn(() => true);
@@ -159,7 +159,7 @@ describe('CodeManager', () => {
         toString: vi.fn(() => 'selected text'),
         removeAllRanges: vi.fn(),
         addRange: vi.fn(),
-      } as unknown));
+      } as unknown as Selection));
 
       // Mock the isInInlineCode to return false
       CodeManager.isInInlineCode = vi.fn(() => false);
@@ -179,7 +179,7 @@ describe('CodeManager', () => {
         toString: vi.fn(() => ''),
         removeAllRanges: vi.fn(),
         addRange: vi.fn(),
-      } as unknown));
+      } as unknown as Selection));
 
       CodeManager.isInInlineCode = vi.fn(() => false);
 
@@ -191,7 +191,7 @@ describe('CodeManager', () => {
     it('handles no selection gracefully', () => {
       window.getSelection = vi.fn(() => ({
         rangeCount: 0
-      } as unknown));
+      } as unknown as Selection));
 
       expect(() => {
         CodeManager.toggleInlineCode();
@@ -215,7 +215,7 @@ describe('CodeManager', () => {
         ctrlKey: true,
         key: 'b',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -228,7 +228,7 @@ describe('CodeManager', () => {
       const mockEvent = {
         key: 'Tab',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -242,7 +242,7 @@ describe('CodeManager', () => {
       const mockEvent = {
         key: 'Enter',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -256,7 +256,7 @@ describe('CodeManager', () => {
       const mockEvent = {
         key: 'b',
         ctrlKey: true
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => false);
 
@@ -267,7 +267,7 @@ describe('CodeManager', () => {
     it('passes through other keys', () => {
       const mockEvent = {
         key: 'a'
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -284,7 +284,7 @@ describe('CodeManager', () => {
         clipboardData: {
           getData: vi.fn(() => pasteText)
         }
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -298,7 +298,7 @@ describe('CodeManager', () => {
       const mockEvent = {
         preventDefault: vi.fn(),
         clipboardData: null
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -313,7 +313,7 @@ describe('CodeManager', () => {
         clipboardData: {
           getData: vi.fn(() => 'text')
         }
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => false);
 
@@ -381,20 +381,20 @@ describe('CodeManager', () => {
         clipboardData: {
           setData: vi.fn()
         }
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       window.getSelection = vi.fn(() => ({
         rangeCount: 1,
         toString: () => 'selected code'
-      } as unknown));
+      } as unknown as Selection));
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
       const result = CodeManager.handleCopyFromCodeBlock(mockEvent);
       expect(result).toBe(true);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
-      expect(mockEvent.clipboardData.setData).toHaveBeenCalledWith('text/plain', 'selected code');
-      expect(mockEvent.clipboardData.setData).toHaveBeenCalledWith('text/html', '<pre><code>selected code</code></pre>');
+      expect(mockEvent.clipboardData!.setData).toHaveBeenCalledWith('text/plain', 'selected code');
+      expect(mockEvent.clipboardData!.setData).toHaveBeenCalledWith('text/html', '<pre><code>selected code</code></pre>');
     });
 
     it('returns false when not in code block', () => {
@@ -403,7 +403,7 @@ describe('CodeManager', () => {
         clipboardData: {
           setData: vi.fn()
         }
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       CodeManager.isInCodeBlock = vi.fn(() => false);
 
@@ -418,11 +418,11 @@ describe('CodeManager', () => {
         clipboardData: {
           setData: vi.fn()
         }
-      } as unknown;
+      } as unknown as ClipboardEvent;
 
       window.getSelection = vi.fn(() => ({
         rangeCount: 0
-      } as unknown));
+      } as unknown as Selection));
 
       CodeManager.isInCodeBlock = vi.fn(() => true);
 
@@ -463,7 +463,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: textNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       // The function should not crash with deeply nested elements
       const result = CodeManager.isInInlineCode();
@@ -480,7 +480,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: orphanedNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       expect(() => {
         CodeManager.isInInlineCode();
@@ -491,7 +491,7 @@ describe('CodeManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: null,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       expect(() => {
         CodeManager.isInInlineCode();

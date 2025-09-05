@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '../../test/test-utils';
 import { Editor } from '../../components/Editor/Editor';
 import React, { useState } from 'react';
@@ -111,8 +111,8 @@ describe('Content Integrity Tests', () => {
       }).not.toThrow();
       
       // Should not pollute prototypes
-      expect((Object.prototype as unknown).polluted).toBeUndefined();
-      expect((Array.prototype as unknown).polluted).toBeUndefined();
+      expect((Object.prototype as any).polluted).toBeUndefined();
+      expect((Array.prototype as any).polluted).toBeUndefined();
     });
   });
 

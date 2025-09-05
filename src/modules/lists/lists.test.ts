@@ -21,7 +21,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -32,7 +32,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: { tagName: 'P' },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(false);
@@ -42,7 +42,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: null,
         rangeCount: 0
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(false);
@@ -61,7 +61,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: bulletListItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.getListType();
       expect(result).toBe('bullet');
@@ -78,7 +78,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: numberedListItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.getListType();
       expect(result).toBe('number');
@@ -88,7 +88,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: { tagName: 'P' },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.getListType();
       expect(result).toBeNull();
@@ -101,12 +101,12 @@ describe('ListManager', () => {
         key: 'Enter',
         preventDefault: vi.fn(),
         target: mockElement
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -118,12 +118,12 @@ describe('ListManager', () => {
         shiftKey: false,
         preventDefault: vi.fn(),
         target: mockElement
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -136,12 +136,12 @@ describe('ListManager', () => {
         shiftKey: true,
         preventDefault: vi.fn(),
         target: mockElement
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -153,14 +153,14 @@ describe('ListManager', () => {
         key: 'Backspace',
         preventDefault: vi.fn(),
         target: mockElement
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       // Mock that we're at the beginning of the list item
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         anchorOffset: 0,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -170,12 +170,12 @@ describe('ListManager', () => {
       const mockEvent = {
         key: 'a',
         target: mockElement
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(false);
@@ -185,12 +185,12 @@ describe('ListManager', () => {
       const mockEvent = {
         key: 'Enter',
         target: { tagName: 'P' }
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: { tagName: 'P' },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(false);
@@ -210,7 +210,7 @@ describe('ListManager', () => {
 
     it('handles invalid list type gracefully', () => {
       expect(() => {
-        ListManager.createList('invalid' as unknown);
+        ListManager.createList('invalid' as any);
       }).not.toThrow();
     });
   });
@@ -224,7 +224,7 @@ describe('ListManager', () => {
           parentElement: { tagName: 'UL' }
         },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       ListManager.toggleList('bullet');
       expect(document.execCommand).toHaveBeenCalledWith('insertUnorderedList', false, undefined);
@@ -238,7 +238,7 @@ describe('ListManager', () => {
           parentElement: { tagName: 'OL' }
         },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       ListManager.toggleList('bullet');
       expect(document.execCommand).toHaveBeenCalledWith('insertUnorderedList', false, undefined);
@@ -248,7 +248,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: { tagName: 'P' },
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       ListManager.toggleList('bullet');
       expect(document.execCommand).toHaveBeenCalledWith('insertUnorderedList', false, undefined);
@@ -275,7 +275,7 @@ describe('ListManager', () => {
         innerHTML: ''
       };
 
-      const result = ListManager.isEmptyListItem(emptyListItem as unknown);
+      const result = ListManager.isEmptyListItem(emptyListItem as unknown as HTMLElement);
       expect(result).toBe(true);
     });
 
@@ -286,7 +286,7 @@ describe('ListManager', () => {
         innerHTML: 'Some content'
       };
 
-      const result = ListManager.isEmptyListItem(nonEmptyListItem as unknown);
+      const result = ListManager.isEmptyListItem(nonEmptyListItem as unknown as HTMLElement);
       expect(result).toBe(false);
     });
 
@@ -297,7 +297,7 @@ describe('ListManager', () => {
         innerHTML: '   \n\t  '
       };
 
-      const result = ListManager.isEmptyListItem(whitespaceListItem as unknown);
+      const result = ListManager.isEmptyListItem(whitespaceListItem as unknown as HTMLElement);
       expect(result).toBe(true);
     });
 
@@ -308,7 +308,7 @@ describe('ListManager', () => {
         innerHTML: '<br>'
       };
 
-      const result = ListManager.isEmptyListItem(htmlWhitespaceItem as unknown);
+      const result = ListManager.isEmptyListItem(htmlWhitespaceItem as unknown as HTMLElement);
       expect(result).toBe(true);
     });
   });
@@ -322,12 +322,12 @@ describe('ListManager', () => {
           tagName: 'LI',
           textContent: 'Content'
         }
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockEvent.target,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -343,12 +343,12 @@ describe('ListManager', () => {
           textContent: '',
           innerHTML: ''
         }
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: mockEvent.target,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleKeyInList(mockEvent);
       expect(result).toBe(true);
@@ -365,7 +365,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: listItemNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -386,7 +386,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: textNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -404,7 +404,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: nodeWithoutParentElement,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -419,7 +419,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: deepNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(false);
@@ -435,7 +435,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: brokenChainNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(false);
@@ -452,7 +452,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: nodeWithoutTag,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -469,7 +469,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       expect(() => {
         ListManager.isInList();
@@ -498,7 +498,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: listItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       // Test the public method that uses private getNestingLevel
       const result = ListManager.isInList();
@@ -535,7 +535,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: nestedListItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -558,7 +558,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: listItemWithTextNodes,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -578,7 +578,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: listNearBody,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -594,7 +594,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result1 = ListManager.isEmptyListItem(emptyWithBrSlash as unknown);
+      const result1 = ListManager.isEmptyListItem(emptyWithBrSlash as unknown as HTMLElement);
       expect(result1).toBe(true);
 
       const emptyWithBrSpace = {
@@ -604,7 +604,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result2 = ListManager.isEmptyListItem(emptyWithBrSpace as unknown);
+      const result2 = ListManager.isEmptyListItem(emptyWithBrSpace as unknown as HTMLElement);
       expect(result2).toBe(true);
     });
 
@@ -615,15 +615,15 @@ describe('ListManager', () => {
         innerHTML: ''
       };
 
-      const result = ListManager.isEmptyListItem(notAListItem as unknown);
+      const result = ListManager.isEmptyListItem(notAListItem as unknown as HTMLElement);
       expect(result).toBe(false);
     });
 
     it('handles null or undefined list item', () => {
-      const result1 = ListManager.isEmptyListItem(null as unknown);
+      const result1 = ListManager.isEmptyListItem(null as unknown as HTMLElement);
       expect(result1).toBe(false);
 
-      const result2 = ListManager.isEmptyListItem(undefined as unknown);
+      const result2 = ListManager.isEmptyListItem(undefined as unknown as HTMLElement);
       expect(result2).toBe(false);
     });
 
@@ -634,7 +634,7 @@ describe('ListManager', () => {
         innerHTML: undefined
       };
 
-      const result = ListManager.isEmptyListItem(itemWithUndefinedContent as unknown);
+      const result = ListManager.isEmptyListItem(itemWithUndefinedContent as unknown as HTMLElement);
       expect(result).toBe(true);
     });
   });
@@ -644,13 +644,13 @@ describe('ListManager', () => {
       const mockEvent = {
         key: 'Backspace',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       window.getSelection = vi.fn(() => ({
         anchorNode: { tagName: 'LI', parentElement: { tagName: 'UL' } },
         anchorOffset: 5, // Not at start
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleBackspaceInList(mockEvent);
       expect(result).toBe(false);
@@ -661,7 +661,7 @@ describe('ListManager', () => {
       const mockEvent = {
         key: 'Backspace',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       const mockListItem = {
         tagName: 'LI',
@@ -673,7 +673,7 @@ describe('ListManager', () => {
         anchorNode: mockListItem,
         anchorOffset: 0, // At start
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleBackspaceInList(mockEvent);
       expect(result).toBe(true); // Should allow default backspace behavior
@@ -684,7 +684,7 @@ describe('ListManager', () => {
       const mockEvent = {
         key: 'Backspace',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       const mockList = {
         tagName: 'UL',
@@ -706,7 +706,7 @@ describe('ListManager', () => {
         rangeCount: 1,
         removeAllRanges: vi.fn(),
         addRange: vi.fn()
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.handleBackspaceInList(mockEvent);
       expect(result).toBe(true);
@@ -725,12 +725,12 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockListItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const mockEvent = {
         key: 'Enter',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       // Mock empty list item
       const originalIsEmpty = ListManager.isEmptyListItem;
@@ -769,12 +769,12 @@ describe('ListManager', () => {
         rangeCount: 1,
         removeAllRanges: vi.fn(),
         addRange: vi.fn()
-      } as unknown));
+      } as unknown as Selection));
 
       const mockEvent = {
         key: 'Enter',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       // Mock empty list item and ensure remove function exists
       const originalIsEmpty = ListManager.isEmptyListItem;
@@ -797,12 +797,12 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: mockListItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const mockEvent = {
         key: 'Enter',
         preventDefault: vi.fn()
-      } as unknown;
+      } as unknown as KeyboardEvent;
 
       // Mock empty list item
       const originalIsEmpty = ListManager.isEmptyListItem;
@@ -833,7 +833,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: nodeWithBoth,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true); // Should use parentElement path
@@ -855,7 +855,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: nodeWithOnlyParentNode,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true); // Should use parentNode path
@@ -890,7 +890,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: complexNestedItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
@@ -921,19 +921,19 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: deeplyNestedItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       const result = ListManager.isInList();
       expect(result).toBe(true);
     });
 
     it('handles null selection gracefully', () => {
-      window.getSelection = vi.fn(() => null as unknown);
+      vi.mocked(window.getSelection).mockReturnValue(null);
 
       expect(() => {
         ListManager.isInList();
         ListManager.getListType();
-        ListManager.handleKeyInList({ key: 'Enter' } as unknown);
+        ListManager.handleKeyInList({ key: 'Enter' } as unknown as KeyboardEvent);
       }).not.toThrow();
     });
 
@@ -946,7 +946,7 @@ describe('ListManager', () => {
       window.getSelection = vi.fn(() => ({
         anchorNode: malformedItem,
         rangeCount: 1
-      } as unknown));
+      } as unknown as Selection));
 
       expect(() => {
         ListManager.isInList();
@@ -963,7 +963,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result = ListManager.isEmptyListItem(mixedContentItem as unknown);
+      const result = ListManager.isEmptyListItem(mixedContentItem as unknown as HTMLElement);
       expect(result).toBe(false);
     });
 
@@ -976,7 +976,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result = ListManager.isEmptyListItem(emptyWithComplexHTML as unknown);
+      const result = ListManager.isEmptyListItem(emptyWithComplexHTML as unknown as HTMLElement);
       expect(result).toBe(false); // Because HTML is not just <br> variants
     });
 
@@ -988,7 +988,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result = ListManager.isEmptyListItem(whitespaceTextItem as unknown);
+      const result = ListManager.isEmptyListItem(whitespaceTextItem as unknown as HTMLElement);
       expect(result).toBe(false); // Should be false because innerHTML has content, not just <br> variants
     });
 
@@ -1000,7 +1000,7 @@ describe('ListManager', () => {
         parentElement: { tagName: 'UL' }
       };
 
-      const result = ListManager.isEmptyListItem(whitespaceWithBrItem as unknown);
+      const result = ListManager.isEmptyListItem(whitespaceWithBrItem as unknown as HTMLElement);
       expect(result).toBe(true); // Should be true because textContent is whitespace and HTML is just <br>
     });
   });

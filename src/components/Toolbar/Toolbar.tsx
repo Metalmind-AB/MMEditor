@@ -4,6 +4,7 @@ import { Dropdown, DropdownOption } from '../Dropdown/Dropdown';
 import { TablePicker } from '../TablePicker/TablePicker';
 import { Format, ToolbarConfig, EditorInstance } from '../Editor/Editor.types';
 import { pluginRegistry } from '../../plugins/PluginRegistry';
+import { PluginToolbarItem } from '../../plugins/types';
 import styles from './Toolbar.module.css';
 
 interface ToolbarProps {
@@ -72,7 +73,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const [currentBlockFormat, setCurrentBlockFormat] = useState<string>('p');
   const [showTablePicker, setShowTablePicker] = useState(false);
   const tableButtonRef = useRef<HTMLDivElement>(null);
-  const [pluginToolbarItems, setPluginToolbarItems] = useState<unknown[]>([]);
+  const [pluginToolbarItems, setPluginToolbarItems] = useState<PluginToolbarItem[]>([]);
   const [iconOverrides, setIconOverrides] = useState<Map<string, React.ReactNode>>(new Map());
   const savedSelectionRef = useRef<Range | null>(null);
 

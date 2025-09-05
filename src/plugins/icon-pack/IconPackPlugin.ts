@@ -113,7 +113,7 @@ export class IconPackPlugin implements Plugin {
     // This will cause the toolbar to re-read icon overrides
     import('../../plugins/PluginRegistry').then(({ pluginRegistry }) => {
       // Access private method to notify changes
-      (pluginRegistry as unknown).notifyChange?.();
+      (pluginRegistry as any).notifyChange?.();
     });
   }
   
@@ -178,17 +178,17 @@ export const IconPackPresets = {
     TableChart: React.ComponentType;
     FormatClear: React.ComponentType;
   }): IconMapping => ({
-    bold: React.createElement(icons.FormatBold as unknown, {}),
-    italic: React.createElement(icons.FormatItalic as unknown, {}),
-    underline: React.createElement(icons.FormatUnderlined as unknown, {}),
-    strike: React.createElement(icons.StrikethroughS as unknown, {}),
-    code: React.createElement(icons.Code as unknown, {}),
-    'code-block': React.createElement(icons.DataObject as unknown, {}),
-    bullet: React.createElement(icons.FormatListBulleted as unknown, {}),
-    number: React.createElement(icons.FormatListNumbered as unknown, {}),
-    link: React.createElement(icons.Link as unknown, {}),
-    table: React.createElement(icons.TableChart as unknown, {}),
-    clear: React.createElement(icons.FormatClear as unknown, {}),
+    bold: React.createElement(icons.FormatBold, {}),
+    italic: React.createElement(icons.FormatItalic, {}),
+    underline: React.createElement(icons.FormatUnderlined, {}),
+    strike: React.createElement(icons.StrikethroughS, {}),
+    code: React.createElement(icons.Code, {}),
+    'code-block': React.createElement(icons.DataObject, {}),
+    bullet: React.createElement(icons.FormatListBulleted, {}),
+    number: React.createElement(icons.FormatListNumbered, {}),
+    link: React.createElement(icons.Link, {}),
+    table: React.createElement(icons.TableChart, {}),
+    clear: React.createElement(icons.FormatClear, {}),
   }),
   
   /**

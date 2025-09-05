@@ -42,7 +42,7 @@ export function initializePlugins(configs?: PluginsConfig): Plugin[] {
  * Type guard to check if a value is a PluginConfig
  */
 export function isPluginConfig(value: unknown): value is PluginConfig {
-  return value && typeof value === 'object' && 'plugin' in value;
+  return Boolean(value && typeof value === 'object' && 'plugin' in value);
 }
 
 /**

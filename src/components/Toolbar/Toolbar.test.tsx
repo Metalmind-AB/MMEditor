@@ -8,12 +8,20 @@ describe('Toolbar Component', () => {
   const mockEditorInstance: EditorInstance = {
     getHTML: vi.fn(() => '<p>Test</p>'),
     setHTML: vi.fn(),
+    getText: vi.fn(() => 'Test'),
+    getLength: vi.fn(() => 4),
     format: vi.fn(),
+    removeFormat: vi.fn(),
     focus: vi.fn(),
     blur: vi.fn(),
     getSelection: vi.fn(),
     setSelection: vi.fn(),
     execCommand: vi.fn(),
+    isFormatActive: vi.fn(() => false),
+    registerPlugin: vi.fn(),
+    unregisterPlugin: vi.fn(),
+    getPlugin: vi.fn(),
+    executeCommand: vi.fn(),
   };
 
   const defaultProps = {
@@ -236,8 +244,27 @@ describe('Toolbar Component', () => {
         getRangeAt: vi.fn(() => mockRange),
         removeAllRanges: vi.fn(),
         addRange: vi.fn(),
+        anchorNode: null,
+        anchorOffset: 0,
+        direction: 'none',
+        focusNode: null,
+        focusOffset: 0,
+        isCollapsed: true,
+        type: 'None',
+        toString: vi.fn(() => ''),
+        collapse: vi.fn(),
+        collapseToEnd: vi.fn(),
+        collapseToStart: vi.fn(),
+        containsNode: vi.fn(() => false),
+        deleteFromDocument: vi.fn(),
+        empty: vi.fn(),
+        extend: vi.fn(),
+        modify: vi.fn(),
+        selectAllChildren: vi.fn(),
+        setBaseAndExtent: vi.fn(),
+        setPosition: vi.fn()
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown);
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown as Selection | null);
       
       render(<Toolbar {...defaultProps} config={tableConfig} />);
       

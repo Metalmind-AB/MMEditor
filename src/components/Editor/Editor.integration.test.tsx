@@ -152,30 +152,31 @@ describe('MMEditor Integration Tests', () => {
     });
 
     it('handles editor instance methods through ref', () => {
-      let editorRef: React.RefObject<EditorInstance> | null = null;
-      
       const TestComponent = () => {
-        editorRef = useRef<EditorInstance>(null);
+        const editorRef = useRef<EditorInstance | null>(null);
+        
+        React.useEffect(() => {
+          // Test that all methods are available
+          expect(editorRef.current?.getHTML).toBeDefined();
+          expect(editorRef.current?.setHTML).toBeDefined();
+          expect(editorRef.current?.format).toBeDefined();
+          expect(editorRef.current?.focus).toBeDefined();
+          expect(editorRef.current?.blur).toBeDefined();
+          expect(editorRef.current?.getSelection).toBeDefined();
+          expect(editorRef.current?.setSelection).toBeDefined();
+          expect(editorRef.current?.execCommand).toBeDefined();
+          
+          // Test methods don't throw errors
+          expect(() => editorRef.current?.getHTML()).not.toThrow();
+          expect(() => editorRef.current?.setHTML('<p>Test</p>')).not.toThrow();
+          expect(() => editorRef.current?.focus()).not.toThrow();
+          expect(() => editorRef.current?.blur()).not.toThrow();
+        });
+        
         return <Editor ref={editorRef} />;
       };
       
       render(<TestComponent />);
-      
-      // Test that all methods are available
-      expect(editorRef?.current?.getHTML).toBeDefined();
-      expect(editorRef?.current?.setHTML).toBeDefined();
-      expect(editorRef?.current?.format).toBeDefined();
-      expect(editorRef?.current?.focus).toBeDefined();
-      expect(editorRef?.current?.blur).toBeDefined();
-      expect(editorRef?.current?.getSelection).toBeDefined();
-      expect(editorRef?.current?.setSelection).toBeDefined();
-      expect(editorRef?.current?.execCommand).toBeDefined();
-      
-      // Test methods don't throw errors
-      expect(() => editorRef?.current?.getHTML()).not.toThrow();
-      expect(() => editorRef?.current?.setHTML('<p>Test</p>')).not.toThrow();
-      expect(() => editorRef?.current?.focus()).not.toThrow();
-      expect(() => editorRef?.current?.blur()).not.toThrow();
     });
   });
 

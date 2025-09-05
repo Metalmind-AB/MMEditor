@@ -3,7 +3,7 @@
  */
 
 import React from 'react';
-import { Plugin, PluginRegistry as IPluginRegistry, PluginCommand } from './types';
+import { Plugin, PluginRegistry as IPluginRegistry, PluginCommand, PluginToolbarItem } from './types';
 import { EditorInstance } from '../components/Editor/Editor.types';
 
 class PluginRegistryImpl implements IPluginRegistry {
@@ -333,8 +333,8 @@ class PluginRegistryImpl implements IPluginRegistry {
   /**
    * Get toolbar items from all enabled plugins
    */
-  getToolbarItems(): unknown[] {
-    const items: unknown[] = [];
+  getToolbarItems(): PluginToolbarItem[] {
+    const items: PluginToolbarItem[] = [];
 
     for (const plugin of this.plugins.values()) {
       if (this.enabledPlugins.has(plugin.name) && plugin.toolbarItems) {
