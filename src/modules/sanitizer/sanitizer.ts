@@ -310,7 +310,7 @@ export class HTMLSanitizer {
     
     // Detect test environment
     this.isTestEnvironment = process.env.NODE_ENV === 'test' ||
-      (typeof window !== 'undefined' && (window as unknown as { __vitest__?: boolean }).__vitest__);
+      (typeof window !== 'undefined' && !!(window as unknown as { __vitest__?: boolean }).__vitest__);
   }
 
   /**
