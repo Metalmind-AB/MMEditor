@@ -66,7 +66,35 @@ jobs:
       run: npm run build
     
     - name: Run E2E tests
-      run: npm run test:e2e
+      run: |
+        # First attempt - may fail on visual regression baseline creation
+        npm run test:e2e || {
+          echo "E2E tests failed, checking if it's just visual regression baselines..."
+          
+          # Check if failure is due to missing visual regression baselines
+          if [ -d "test-results" ] && find test-results -name "*actual.png" -type f | grep -q .; then
+            echo "Visual regression baselines created, retrying tests..."
+            npm run test:e2e
+          else
+            echo "E2E tests failed for other reasons"
+            exit 1
+          fi
+        }
+    
+    - name: Commit visual regression baselines
+      if: success()
+      run: |
+        # Check if any new visual regression baselines were created
+        if [ -d "e2e" ] && find e2e -name "*-snapshots" -type d | grep -q .; then
+          echo "Visual regression baselines were created, committing them..."
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add e2e/**/*-snapshots/
+          git commit -m "Add visual regression baselines from CI" || echo "No new baselines to commit"
+          git push || echo "Push failed or no changes to push"
+        else
+          echo "No visual regression baselines to commit"
+        fi
     
     - name: Upload E2E test results
       uses: actions/upload-artifact@v4

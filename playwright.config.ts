@@ -11,6 +11,15 @@ export default defineConfig({
     baseURL: 'http://localhost:5173',
     trace: 'on-first-retry',
   },
+  
+  // Visual regression settings
+  expect: {
+    toHaveScreenshot: { 
+      threshold: 0.2,
+      // Allow slight differences in rendering between environments
+      animationMode: 'disabled'
+    },
+  },
 
   projects: [
     {
