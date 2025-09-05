@@ -309,7 +309,7 @@ export class HTMLSanitizer {
     };
     
     // Detect test environment
-    this.isTestEnvironment = import.meta.env.MODE === 'test' ||
+    this.isTestEnvironment = process.env.NODE_ENV === 'test' ||
       (typeof window !== 'undefined' && (window as any).__vitest__);
   }
 

@@ -114,7 +114,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       const result = document.execCommand(command, false, value);
       
       // Log if command fails in development
-      if (!result && import.meta.env.DEV) {
+      if (!result && (process.env.NODE_ENV === 'development')) {
         console.warn(`execCommand '${command}' failed with value:`, value);
       }
       
