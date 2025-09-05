@@ -89,7 +89,7 @@ jobs:
           echo "Visual regression baselines were created, committing them..."
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add e2e/**/*-snapshots/
+          find e2e -name "*-snapshots" -type d -exec git add {}/ \;
           git commit -m "Add visual regression baselines from CI" || echo "No new baselines to commit"
           git push || echo "Push failed or no changes to push"
         else
