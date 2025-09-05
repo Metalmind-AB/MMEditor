@@ -69,7 +69,7 @@ jobs:
       run: npm run test:e2e
     
     - name: Upload E2E test results
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: playwright-report
@@ -96,7 +96,7 @@ jobs:
       run: npm audit
     
     - name: Run security tests
-      run: npm run test -- --grep "Security|XSS|sanitiz"
+      run: npm run test:security
 
   performance-tests:
     runs-on: ubuntu-latest
@@ -115,7 +115,7 @@ jobs:
       run: npm ci
     
     - name: Run performance tests
-      run: npm run test -- --grep "Performance|performance"
+      run: npm run test:performance
     
     - name: Build and check bundle size
       run: |
