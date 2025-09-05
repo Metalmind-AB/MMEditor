@@ -2,14 +2,14 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Visual Regression Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/basic');
     // Wait for editor to be ready
     await page.waitForSelector('[role="textbox"]');
   });
 
   test('editor initial state', async ({ page }) => {
     // Take screenshot of clean editor
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('editor-initial.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('editor-initial.png');
   });
 
   test('editor with content', async ({ page }) => {
@@ -22,21 +22,21 @@ test.describe('Visual Regression Tests', () => {
     await page.keyboard.press('Control+a');
     await page.locator('[aria-label="Bold (Ctrl+B)"]').click();
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('editor-with-bold-content.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('editor-with-bold-content.png');
   });
 
   test('toolbar hover states', async ({ page }) => {
     // Hover over bold button
     await page.locator('[aria-label="Bold (Ctrl+B)"]').hover();
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('toolbar-bold-hover.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('toolbar-bold-hover.png');
   });
 
   test('dropdown open state', async ({ page }) => {
     // Open heading dropdown
     await page.locator('text=Normal').click();
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('heading-dropdown-open.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('heading-dropdown-open.png');
   });
 
   test('list formatting', async ({ page }) => {
@@ -49,7 +49,7 @@ test.describe('Visual Regression Tests', () => {
     await page.keyboard.press('Control+a');
     await page.locator('[aria-label="Bullet List"]').click();
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('bullet-list.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('bullet-list.png');
   });
 
   test('mixed formatting', async ({ page }) => {
@@ -72,21 +72,21 @@ test.describe('Visual Regression Tests', () => {
     
     await editor.type(' formatting.');
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('mixed-formatting.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('mixed-formatting.png');
   });
 
   test('responsive layout - mobile', async ({ page }) => {
     // Set mobile viewport
     await page.setViewportSize({ width: 375, height: 667 });
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('mobile-layout.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('mobile-layout.png');
   });
 
   test('responsive layout - tablet', async ({ page }) => {
     // Set tablet viewport
     await page.setViewportSize({ width: 768, height: 1024 });
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('tablet-layout.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('tablet-layout.png');
   });
 
   test('focus states', async ({ page }) => {
@@ -95,7 +95,7 @@ test.describe('Visual Regression Tests', () => {
     // Focus the editor
     await editor.focus();
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('editor-focused.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('editor-focused.png');
   });
 
   test('error states', async ({ page }) => {
@@ -112,7 +112,7 @@ test.describe('Visual Regression Tests', () => {
     // Wait for any error state to be rendered
     await page.waitForTimeout(100);
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('error-state.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('error-state.png');
   });
 
   test('dark theme (if available)', async ({ page }) => {
@@ -123,7 +123,7 @@ test.describe('Visual Regression Tests', () => {
       await themeToggle.click();
       await page.waitForTimeout(200); // Wait for theme transition
       
-      await expect(page.locator('.mmeditor-container')).toHaveScreenshot('dark-theme.png');
+      await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('dark-theme.png');
     }
   });
 });
@@ -131,7 +131,7 @@ test.describe('Visual Regression Tests', () => {
 // Cross-browser visual consistency tests
 test.describe('Cross-browser Visual Consistency', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/basic');
     await page.waitForSelector('[role="textbox"]');
   });
 
@@ -145,7 +145,7 @@ test.describe('Cross-browser Visual Consistency', () => {
     await page.locator('[aria-label="Bold (Ctrl+B)"]').click();
     
     // Take screenshot with browser name
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot(`cross-browser-${browserName}.png`);
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot(`cross-browser-${browserName}.png`);
   });
 
   test('toolbar consistency', async ({ page, browserName }) => {
@@ -166,7 +166,7 @@ test.describe('Performance Visual Tests', () => {
       await page.keyboard.press('Enter');
     }
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('large-content.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('large-content.png');
   });
 
   test('complex formatting rendering', async ({ page }) => {
@@ -183,6 +183,6 @@ test.describe('Performance Visual Tests', () => {
     await page.locator('[aria-label="Underline (Ctrl+U)"]').click();
     await editor.type('bold-italic-underline');
     
-    await expect(page.locator('.mmeditor-container')).toHaveScreenshot('complex-formatting.png');
+    await expect(page.locator('[role="textbox"] >> xpath=..')).toHaveScreenshot('complex-formatting.png');
   });
 });

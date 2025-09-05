@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('MMEditor Basic Functionality', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto('/');
+    await page.goto('/basic');
   });
 
   test('loads the editor correctly', async ({ page }) => {
@@ -141,7 +141,7 @@ test.describe('MMEditor Basic Functionality', () => {
 
 test.describe('MMEditor Cross-Browser Compatibility', () => {
   test('works consistently across browsers', async ({ page, browserName }) => {
-    await page.goto('/');
+    await page.goto('/basic');
     
     const editor = page.locator('[role="textbox"]');
     
