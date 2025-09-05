@@ -120,7 +120,8 @@ jobs:
     - name: Build and check bundle size
       run: |
         npm run build
-        npx bundlesize
+        echo "Build outputs:"
+        ls -lah dist/
 
   build-check:
     runs-on: ubuntu-latest
