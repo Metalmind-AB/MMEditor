@@ -126,13 +126,17 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
         
         const formats = new Set<Format>();
         
-        // Check basic formatting
-        if (document.queryCommandState('bold')) formats.add('bold');
-        if (document.queryCommandState('italic')) formats.add('italic');
-        if (document.queryCommandState('underline')) formats.add('underline');
-        if (document.queryCommandState('strikethrough')) formats.add('strike');
-        if (document.queryCommandState('insertUnorderedList')) formats.add('bullet');
-        if (document.queryCommandState('insertOrderedList')) formats.add('number');
+        // Check basic formatting - wrap in try-catch for test environments
+        try {
+          if (document.queryCommandState('bold')) formats.add('bold');
+          if (document.queryCommandState('italic')) formats.add('italic');
+          if (document.queryCommandState('underline')) formats.add('underline');
+          if (document.queryCommandState('strikethrough')) formats.add('strike');
+          if (document.queryCommandState('insertUnorderedList')) formats.add('bullet');
+          if (document.queryCommandState('insertOrderedList')) formats.add('number');
+        } catch {
+          // Ignore errors in test environments where queryCommandState may not be fully supported
+        }
         
         // Check code formatting
         if (CodeManager.isInInlineCode()) formats.add('code');
