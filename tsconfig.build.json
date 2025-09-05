@@ -1,0 +1,42 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "allowImportingTsExtensions": false,
+    "moduleResolution": "node",
+    "composite": false,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": [
+    "src/components/**/*",
+    "src/modules/**/*",
+    "src/hooks/**/*",
+    "src/plugins/**/*",
+    "src/contexts/**/*",
+    "src/types/**/*",
+    "src/utils/**/*",
+    "src/index.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.tsx",
+    "src/**/*.test.ts",
+    "src/__tests__/**/*",
+    "src/test/**/*",
+    "src/plugins/template/**/*",
+    "**/*.stories.*",
+    "**/*.spec.*",
+    "**/node_modules",
+    "**/dist",
+    "demo/**/*",
+    "vite.config.ts"
+  ]
+}
