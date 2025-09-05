@@ -43,7 +43,7 @@ export function useTouchEvents(
     }
   }, [handlers]);
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
+  const handleTouchMove = useCallback((_e: TouchEvent) => {
     // Cancel long press if user moves
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);

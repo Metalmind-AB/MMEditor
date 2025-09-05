@@ -121,7 +121,7 @@ export class TableManager {
     
     try {
       cell.focus();
-    } catch (e) {
+    } catch {
       // Some elements may not be focusable, silently ignore
     }
   }

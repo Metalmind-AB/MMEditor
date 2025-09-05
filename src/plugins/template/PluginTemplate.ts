@@ -53,7 +53,7 @@ export class PluginTemplate implements Plugin {
         // Your custom action here
         this.performCustomAction(editor);
       },
-      isActive: (editor: EditorInstance) => {
+      isActive: (_editor: EditorInstance) => {
         // Return true when this format/state is active
         return false;
       },
@@ -67,12 +67,12 @@ export class PluginTemplate implements Plugin {
   commands: PluginCommand[] = [
     {
       name: 'myCommand',
-      execute: (editor: EditorInstance, ...args: any[]) => {
+      execute: (editor: EditorInstance, ...args: unknown[]) => {
         // Command implementation
         this.log('Executing command with args:', args);
         editor.execCommand('insertText', 'Command executed!');
       },
-      canExecute: (editor: EditorInstance) => {
+      canExecute: (_editor: EditorInstance) => {
         // Return false to disable command
         return this.config.enabled !== false;
       },
@@ -314,7 +314,7 @@ export class PluginTemplate implements Plugin {
     }
   }
   
-  private autoSave(content: string): void {
+  private autoSave(_content: string): void {
     // Implement auto-save logic
     this.log('Auto-saving content...');
   }
@@ -344,7 +344,7 @@ export class PluginTemplate implements Plugin {
   /**
    * Debug logging helper
    */
-  private log(...args: any[]): void {
+  private log(...args: unknown[]): void {
     if (this.config.debugMode) {
       console.log(`[${this.name}]`, ...args);
     }

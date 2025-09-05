@@ -113,7 +113,7 @@ export class IconPackPlugin implements Plugin {
     // This will cause the toolbar to re-read icon overrides
     import('../../plugins/PluginRegistry').then(({ pluginRegistry }) => {
       // Access private method to notify changes
-      (pluginRegistry as any).notifyChange?.();
+      (pluginRegistry as unknown).notifyChange?.();
     });
   }
   
@@ -140,7 +140,7 @@ export class IconPackPlugin implements Plugin {
   /**
    * Optional: Log which icon pack is being used
    */
-  async onInit(editor: EditorInstance): Promise<void> {
+  async onInit(_editor: EditorInstance): Promise<void> {
     if (this.iconConfig?.type) {
       console.log(`Icon Pack Plugin initialized with ${this.iconConfig.type} icons`);
     } else {
@@ -178,17 +178,17 @@ export const IconPackPresets = {
     TableChart: React.ComponentType;
     FormatClear: React.ComponentType;
   }): IconMapping => ({
-    bold: React.createElement(icons.FormatBold as any, {}),
-    italic: React.createElement(icons.FormatItalic as any, {}),
-    underline: React.createElement(icons.FormatUnderlined as any, {}),
-    strike: React.createElement(icons.StrikethroughS as any, {}),
-    code: React.createElement(icons.Code as any, {}),
-    'code-block': React.createElement(icons.DataObject as any, {}),
-    bullet: React.createElement(icons.FormatListBulleted as any, {}),
-    number: React.createElement(icons.FormatListNumbered as any, {}),
-    link: React.createElement(icons.Link as any, {}),
-    table: React.createElement(icons.TableChart as any, {}),
-    clear: React.createElement(icons.FormatClear as any, {}),
+    bold: React.createElement(icons.FormatBold as unknown, {}),
+    italic: React.createElement(icons.FormatItalic as unknown, {}),
+    underline: React.createElement(icons.FormatUnderlined as unknown, {}),
+    strike: React.createElement(icons.StrikethroughS as unknown, {}),
+    code: React.createElement(icons.Code as unknown, {}),
+    'code-block': React.createElement(icons.DataObject as unknown, {}),
+    bullet: React.createElement(icons.FormatListBulleted as unknown, {}),
+    number: React.createElement(icons.FormatListNumbered as unknown, {}),
+    link: React.createElement(icons.Link as unknown, {}),
+    table: React.createElement(icons.TableChart as unknown, {}),
+    clear: React.createElement(icons.FormatClear as unknown, {}),
   }),
   
   /**

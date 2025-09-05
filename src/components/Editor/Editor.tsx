@@ -94,7 +94,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       };
     }, []);
 
-    const setSelection = useCallback((range: SelectionRange): void => {
+    const setSelection = useCallback((_range: SelectionRange): void => {
       if (!editorRef.current) return;
       
       const selection = window.getSelection();
@@ -147,8 +147,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       }, 0);
     }, []);
 
-    // format doesn't need to be in a useCallback since execCommand is stable
-    const format = (formatName: string, value?: any): void => {
+    // We need to use a ref to avoid circular dependency issues
+    const handleLinkFormatRef = useRef<() => void>();
+    
+    const format = useCallback((formatName: string, _value?: unknown): void => {
       switch (formatName) {
         case 'bold':
           execCommand('bold');
@@ -186,7 +188,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
           execCommand('styleWithCSS', 'false'); // Trigger update
           break;
         case 'link':
-          handleLinkFormat();
+          // Use ref to avoid circular dependency
+          if (handleLinkFormatRef.current) {
+            handleLinkFormatRef.current();
+          }
           break;
         case 'clear':
           // Deprecated - but kept for backwards compatibility
@@ -196,7 +201,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
         default:
           break;
       }
-    };
+    }, [execCommand]);
 
     const removeFormat = useCallback((): void => {
       execCommand('removeFormat');
@@ -225,7 +230,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     // Use a ref to store the editor instance for executeCommand
     const editorInstanceRef = useRef<EditorInstance | null>(null);
     
-    const executeCommand = useCallback((commandName: string, ...args: any[]) => {
+    const executeCommand = useCallback((commandName: string, ...args: unknown[]) => {
       const commands = pluginRegistry.getCommands();
       const command = commands.get(commandName);
       if (command && command.execute && editorInstanceRef.current) {
@@ -257,9 +262,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
           case 'h3':
           case 'h4':
           case 'h5':
-          case 'h6':
+          case 'h6': {
             const block = document.queryCommandValue('formatBlock');
             return block.toLowerCase() === formatName;
+          }
           default:
             return false;
         }
@@ -291,7 +297,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       setActiveFormats(formats);
     }, [isFormatActive]);
 
-    const editorInstance: EditorInstance = {
+    const editorInstance: EditorInstance = useMemo(() => ({
       getHTML,
       setHTML,
       getText,
@@ -308,7 +314,24 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       unregisterPlugin,
       getPlugin,
       executeCommand,
-    };
+    }), [
+      getHTML,
+      setHTML,
+      getText,
+      getLength,
+      getSelection,
+      setSelection,
+      format,
+      removeFormat,
+      execCommand,
+      focus,
+      blur,
+      isFormatActive,
+      registerPlugin,
+      unregisterPlugin,
+      getPlugin,
+      executeCommand,
+    ]);
     
     // Store the instance in ref for executeCommand
     editorInstanceRef.current = editorInstance;
@@ -414,7 +437,9 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
             break;
           case 'k':
             e.preventDefault();
-            handleLinkFormat();
+            if (handleLinkFormatRef.current) {
+              handleLinkFormatRef.current();
+            }
             break;
           case 'z':
             if (e.shiftKey) {
@@ -472,6 +497,9 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       setLinkDialogOpen(true);
     }, [saveSelection]);
 
+    // Assign to ref for use in format function
+    handleLinkFormatRef.current = handleLinkFormat;
+
     const handleLinkSubmit = useCallback((data: LinkData) => {
       restoreSelection();
       
@@ -521,6 +549,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
         onChange?.(html);
       }
     }, [restoreSelection, updateActiveFormats, getHTML, onChange]);
+
 
     const handleLinkRemove = useCallback(() => {
       restoreSelection();
@@ -614,7 +643,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       if (defaultValue && !isControlled) {
         setHTML(defaultValue);
       }
-    }, []);
+    }, [defaultValue, isControlled, setHTML]);
 
     // Track if plugins have been initialized to prevent double initialization
     const pluginsInitializedRef = useRef(false);

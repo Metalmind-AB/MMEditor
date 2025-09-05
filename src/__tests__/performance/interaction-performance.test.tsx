@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '../../test/test-utils';
-import { performanceUtils, editorTestUtils } from '../../test/test-utils';
+import { performanceUtils } from '../../test/test-utils';
 import { Editor } from '../../components/Editor/Editor';
 
 describe('Interaction Performance Tests', () => {

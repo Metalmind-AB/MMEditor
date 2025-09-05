@@ -25,6 +25,13 @@ export default defineConfig({
         'react',
         'react-dom',
         'react/jsx-runtime',
+        '@emotion/react',
+        '@emotion/styled',
+        '@mui/icons-material',
+        'lucide-react',
+        /^@emotion\//,
+        /^@mui\//,
+        /^lucide-/,
       ],
       output: {
         globals: {

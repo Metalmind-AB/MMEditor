@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 /**
  * Hook for debouncing function calls
  */
-export function useDebounce<T extends (...args: any[]) => any>(
+export function useDebounce<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): (...args: Parameters<T>) => void {
@@ -29,7 +29,7 @@ export function useDebounce<T extends (...args: any[]) => any>(
 /**
  * Hook for throttling function calls
  */
-export function useThrottle<T extends (...args: any[]) => any>(
+export function useThrottle<T extends (...args: unknown[]) => unknown>(
   callback: T,
   delay: number
 ): (...args: Parameters<T>) => void {

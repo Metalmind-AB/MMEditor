@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, act } from '../../test/test-utils';
-import { performanceUtils, editorTestUtils } from '../../test/test-utils';
+import { performanceUtils } from '../../test/test-utils';
 import { Editor } from '../../components/Editor/Editor';
 import React, { useState } from 'react';
 

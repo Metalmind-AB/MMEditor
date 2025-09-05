@@ -65,7 +65,7 @@ export interface FormatDefinition {
 
 export interface CommandDefinition {
   name: string;
-  execute: (editor: EditorInstance, ...args: any[]) => void;
+  execute: (editor: EditorInstance, ...args: unknown[]) => void;
 }
 
 export interface EditorInstance {
@@ -75,16 +75,16 @@ export interface EditorInstance {
   getLength(): number;
   getSelection(): SelectionRange | null;
   setSelection(range: SelectionRange): void;
-  format(name: string, value?: any): void;
+  format(name: string, value?: unknown): void;
   removeFormat(range?: SelectionRange): void;
-  execCommand(name: string, ...args: any[]): void;
+  execCommand(name: string, ...args: unknown[]): void;
   focus(): void;
   blur(): void;
   isFormatActive(format: Format): boolean;
   registerPlugin(plugin: Plugin): void;
   unregisterPlugin(pluginName: string): void;
   getPlugin(pluginName: string): Plugin | undefined;
-  executeCommand(commandName: string, ...args: any[]): void;
+  executeCommand(commandName: string, ...args: unknown[]): void;
 }
 
 export interface SelectionRange {

@@ -14,10 +14,10 @@ describe('TableManager', () => {
   function createMockCell(tagName: string = 'TD', cellIndex: number = 0): HTMLTableCellElement {
     const cell = document.createElement(tagName.toLowerCase() as 'td' | 'th');
     // Use a custom property to track cellIndex since the real one is read-only
-    (cell as any).__mockCellIndex = cellIndex;
+    (cell as unknown).__mockCellIndex = cellIndex;
     Object.defineProperty(cell, 'cellIndex', {
-      get() { return (this as any).__mockCellIndex; },
-      set(value) { (this as any).__mockCellIndex = value; },
+      get() { return (this as unknown).__mockCellIndex; },
+      set(value) { (this as unknown).__mockCellIndex = value; },
       configurable: true
     });
     return cell as HTMLTableCellElement;
@@ -29,10 +29,10 @@ describe('TableManager', () => {
     cells.forEach(cell => row.appendChild(cell));
     
     // Use a custom property to track rowIndex since the real one is read-only
-    (row as any).__mockRowIndex = rowIndex;
+    (row as unknown).__mockRowIndex = rowIndex;
     Object.defineProperty(row, 'rowIndex', {
-      get() { return (this as any).__mockRowIndex; },
-      set(value) { (this as any).__mockRowIndex = value; },
+      get() { return (this as unknown).__mockRowIndex; },
+      set(value) { (this as unknown).__mockRowIndex = value; },
       configurable: true
     });
     
@@ -55,7 +55,7 @@ describe('TableManager', () => {
       setEnd: vi.fn(),
       selectNodeContents: vi.fn(),
       collapse: vi.fn(),
-    } as any;
+    } as unknown;
 
     // Create mock selection
     mockSelection = {
@@ -64,7 +64,7 @@ describe('TableManager', () => {
       getRangeAt: vi.fn(() => mockRange),
       removeAllRanges: vi.fn(),
       addRange: vi.fn(),
-    } as any;
+    } as unknown;
 
     // Mock window.getSelection
     vi.mocked(window.getSelection).mockReturnValue(mockSelection);
@@ -106,9 +106,9 @@ describe('TableManager', () => {
 
     // Mock querySelector methods
     mockTable.querySelectorAll = vi.fn((selector) => {
-      if (selector === 'tr') return [mockRow] as any;
-      if (selector === 'td, th') return [mockCell] as any;
-      return [] as any;
+      if (selector === 'tr') return [mockRow] as unknown;
+      if (selector === 'td, th') return [mockCell] as unknown;
+      return [] as unknown;
     });
 
     mockTable.querySelector = vi.fn((selector) => {
@@ -117,8 +117,8 @@ describe('TableManager', () => {
     });
 
     mockTbody.querySelectorAll = vi.fn((selector) => {
-      if (selector === 'tr') return [mockRow] as any;
-      return [] as any;
+      if (selector === 'tr') return [mockRow] as unknown;
+      return [] as unknown;
     });
 
     mockTbody.querySelector = vi.fn((selector) => {
@@ -314,7 +314,7 @@ describe('TableManager', () => {
         preventDefault: vi.fn(),
         shiftKey: false,
         key: 'Tab'
-      } as any;
+      } as unknown;
       
       // Mock TableManager methods
       vi.spyOn(TableManager, 'isInTable').mockReturnValue(true);
@@ -355,7 +355,7 @@ describe('TableManager', () => {
     it('navigates to next cell on Tab', () => {
       const nextCell = createMockCell('TD', 1);
       mockCell.cellIndex = 0;
-      mockTable.querySelectorAll = vi.fn(() => [mockCell, nextCell] as any);
+      mockTable.querySelectorAll = vi.fn(() => [mockCell, nextCell] as unknown);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -368,7 +368,7 @@ describe('TableManager', () => {
       const prevCell = createMockCell('TD', 0);
       mockEvent.shiftKey = true;
       mockCell.cellIndex = 1;
-      mockTable.querySelectorAll = vi.fn(() => [prevCell, mockCell] as any);
+      mockTable.querySelectorAll = vi.fn(() => [prevCell, mockCell] as unknown);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -379,7 +379,7 @@ describe('TableManager', () => {
 
     it('adds new row when Tab pressed on last cell', () => {
       mockCell.cellIndex = 0;
-      mockTable.querySelectorAll = vi.fn(() => [mockCell] as any);
+      mockTable.querySelectorAll = vi.fn(() => [mockCell] as unknown);
       
       const result = TableManager.handleTabInTable(mockEvent);
       
@@ -572,7 +572,7 @@ describe('TableManager', () => {
 
     it('deletes current row when multiple rows exist', () => {
       const row2 = createMockRow([createMockCell('TD')], 1);
-      const cell2 = row2.cells[0];
+      // const cell2 = row2.cells[0];
       
       // Mock table with 2 rows
       Object.defineProperty(mockTable, 'rows', {
@@ -630,7 +630,7 @@ describe('TableManager', () => {
       const remove = vi.fn();
       mockCell.remove = remove;
       
-      mockTable.querySelectorAll = vi.fn(() => [newRow] as any);
+      mockTable.querySelectorAll = vi.fn(() => [newRow] as unknown);
       
       TableManager.deleteColumn();
       
@@ -643,7 +643,7 @@ describe('TableManager', () => {
       const remove = vi.fn();
       mockCell.remove = remove;
       
-      mockTable.querySelectorAll = vi.fn(() => [newRow] as any);
+      mockTable.querySelectorAll = vi.fn(() => [newRow] as unknown);
       
       TableManager.deleteColumn();
       
@@ -669,7 +669,7 @@ describe('TableManager', () => {
       mockEvent = {
         key: 'ArrowDown',
         preventDefault: vi.fn()
-      } as any;
+      } as unknown;
       
       vi.spyOn(TableManager, 'isInTable').mockReturnValue(true);
       vi.spyOn(TableManager, 'getCurrentCell').mockReturnValue(mockCell);
@@ -714,7 +714,7 @@ describe('TableManager', () => {
     });
 
     it('returns false for right arrow at last cell', () => {
-      const newRow = createMockRow([mockCell]);
+      createMockRow([mockCell]);
       mockCell.cellIndex = 0;
       mockEvent.key = 'ArrowRight';
       
@@ -736,7 +736,7 @@ describe('TableManager', () => {
       mockEvent = {
         key: 'ArrowDown',
         preventDefault: vi.fn()
-      } as any;
+      } as unknown;
       
       mockElement = document.createElement('p');
       
@@ -744,7 +744,7 @@ describe('TableManager', () => {
         commonAncestorContainer: mockElement
       };
       
-      mockSelection.getRangeAt = vi.fn(() => mockRange as any);
+      mockSelection.getRangeAt = vi.fn(() => mockRange as unknown);
       vi.spyOn(TableManager, 'focusCell').mockImplementation(vi.fn());
     });
 
@@ -832,7 +832,7 @@ describe('TableManager', () => {
     it('handles keyboard events with missing properties', () => {
       const incompleteEvent = {
         preventDefault: vi.fn()
-      } as any;
+      } as unknown;
       
       // These should handle incomplete events gracefully
       expect(() => TableManager.handleTabInTable(incompleteEvent)).not.toThrow();
@@ -856,7 +856,7 @@ describe('TableManager', () => {
         key: 'ArrowUp',
         shiftKey: false,
         preventDefault: vi.fn()
-      } as any;
+      } as unknown;
       
       mockSelection.anchorNode = mockCell;
       vi.mocked(window.getSelection).mockReturnValue(mockSelection);
@@ -878,7 +878,7 @@ describe('TableManager', () => {
         return null;
       });
       
-      mockTbody.querySelectorAll = vi.fn(() => [mockRow] as any);
+      mockTbody.querySelectorAll = vi.fn(() => [mockRow] as unknown);
       Object.defineProperty(mockRow, 'cells', {
         value: [mockCell],
         configurable: true
@@ -900,7 +900,7 @@ describe('TableManager', () => {
       mockEvent = {
         key: 'ArrowDown',
         preventDefault: vi.fn()
-      } as any;
+      } as unknown;
       
       mockElement = document.createElement('p');
       mockTable = document.createElement('table');

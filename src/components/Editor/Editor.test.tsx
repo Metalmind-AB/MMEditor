@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+// import userEvent from '@testing-library/user-event';
 import { Editor } from './Editor';
 import { EditorInstance } from './Editor.types';
-import { sanitizer } from '../../modules/sanitizer/sanitizer';
+// import { sanitizer } from '../../modules/sanitizer/sanitizer';
 import React, { useRef } from 'react';
 
 describe('MMEditor', () => {
@@ -154,7 +154,7 @@ describe('MMEditor Link Functionality', () => {
   it('covers link format handling workflow', () => {
     // This test covers the link format functions without complex DOM interaction
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -215,7 +215,7 @@ describe('MMEditor Context Menu', () => {
 describe('MMEditor Selection Management', () => {
   it('saves and restores selection', () => {
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         // Test selection save/restore through private methods
@@ -252,7 +252,7 @@ describe('MMEditor Plugin System', () => {
 
   it('handles plugin commands', () => {
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current && editorRef.current.executeCommand) {
@@ -318,7 +318,7 @@ describe('MMEditor Format Detection', () => {
     });
     
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -343,7 +343,7 @@ describe('MMEditor Format Detection', () => {
     });
     
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -363,7 +363,7 @@ describe('MMEditor Format Detection', () => {
 describe('MMEditor Text Operations', () => {
   it('gets and sets text content', async () => {
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       const [mounted, setMounted] = React.useState(false);
       
       React.useEffect(() => {
@@ -391,12 +391,12 @@ describe('MMEditor Text Operations', () => {
     const mockSelection = {
       rangeCount: 0,
       removeAllRanges: vi.fn()
-    } as any;
+    } as unknown;
     
     vi.mocked(window.getSelection).mockReturnValue(mockSelection);
     
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -420,7 +420,7 @@ describe('MMEditor Text Operations', () => {
 describe('MMEditor Additional Coverage', () => {
   it('covers format method edge cases', () => {
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -468,7 +468,7 @@ describe('MMEditor Additional Coverage', () => {
 
   it('covers beforeChange and afterChange plugin hooks', () => {
     const TestComponent = () => {
-      const editorRef = useRef<any>(null);
+      const editorRef = useRef<unknown>(null);
       
       React.useEffect(() => {
         if (editorRef.current) {
@@ -491,7 +491,7 @@ describe('MMEditor Additional Coverage', () => {
   it('covers controlled vs uncontrolled mode switches', () => {
     const TestComponent = () => {
       const [value, setValue] = React.useState('<p>Initial</p>');
-      const [isControlled, setIsControlled] = React.useState(true);
+      const [isControlled, _setIsControlled] = React.useState(true);
       
       React.useEffect(() => {
         // Switch from controlled to uncontrolled

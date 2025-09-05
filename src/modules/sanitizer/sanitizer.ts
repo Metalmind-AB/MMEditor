@@ -310,7 +310,7 @@ export class HTMLSanitizer {
     
     // Detect test environment
     this.isTestEnvironment = process.env.NODE_ENV === 'test' ||
-      (typeof window !== 'undefined' && (window as any).__vitest__);
+      (typeof window !== 'undefined' && (window as unknown).__vitest__);
   }
 
   /**
@@ -463,12 +463,13 @@ export class HTMLSanitizer {
           }
           break;
 
-        case 'style':
+        case 'style': {
           const sanitizedStyle = this.sanitizeStyle(attrValue);
           if (sanitizedStyle) {
             result[normalizedName] = sanitizedStyle;
           }
           break;
+        }
 
         case 'target':
           // Only allow _blank and _self
@@ -525,7 +526,7 @@ export class HTMLSanitizer {
           }
           break;
 
-        case 'style':
+        case 'style': {
           const sanitizedStyle = this.sanitizeStyle(attr.value);
           if (sanitizedStyle) {
             element.setAttribute('style', sanitizedStyle);
@@ -533,6 +534,7 @@ export class HTMLSanitizer {
             element.removeAttribute('style');
           }
           break;
+        }
 
         case 'target':
           // Only allow _blank and _self

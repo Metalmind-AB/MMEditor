@@ -9,7 +9,7 @@ import styles from './Toolbar.module.css';
 interface ToolbarProps {
   config: ToolbarConfig;
   activeFormats: Set<Format>;
-  onFormat: (format: Format, value?: any) => void;
+  onFormat: (format: Format, value?: unknown) => void;
   editorInstance: EditorInstance;
 }
 
@@ -72,7 +72,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   const [currentBlockFormat, setCurrentBlockFormat] = useState<string>('p');
   const [showTablePicker, setShowTablePicker] = useState(false);
   const tableButtonRef = useRef<HTMLDivElement>(null);
-  const [pluginToolbarItems, setPluginToolbarItems] = useState<any[]>([]);
+  const [pluginToolbarItems, setPluginToolbarItems] = useState<unknown[]>([]);
   const [iconOverrides, setIconOverrides] = useState<Map<string, React.ReactNode>>(new Map());
   const savedSelectionRef = useRef<Range | null>(null);
 

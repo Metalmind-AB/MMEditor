@@ -77,10 +77,10 @@ export class ListManager {
    * Checks if a list item is empty
    */
   static isEmptyListItem(listItem: HTMLElement): boolean {
-    if (!listItem || (listItem as any).tagName !== 'LI') return false;
+    if (!listItem || (listItem as unknown).tagName !== 'LI') return false;
     
-    const text = (listItem as any).textContent?.trim();
-    const html = (listItem as any).innerHTML?.trim() || '';
+    const text = (listItem as unknown).textContent?.trim();
+    const html = (listItem as unknown).innerHTML?.trim() || '';
     
     // Empty if no text content
     if (!text || text === '') {
@@ -226,7 +226,7 @@ export class ListManager {
    * Exits list and continues with normal paragraph
    */
   private static exitList(listItem: HTMLElement): boolean {
-    const list = (listItem as any).parentElement;
+    const list = (listItem as unknown).parentElement;
     if (!list) return false;
 
     // In test environment, we just use document.execCommand
@@ -271,7 +271,7 @@ export class ListManager {
     while (current && current !== document.body) {
       // Check if current node is a list item - handle both real DOM and mock objects
       if (current && typeof current === 'object' && 'tagName' in current) {
-        const element = current as any;
+        const element = current as unknown;
         if (element.tagName === 'LI') {
           return element;
         }
@@ -279,9 +279,9 @@ export class ListManager {
       
       // Move to parent - handle both real DOM and mock objects
       if (current && typeof current === 'object' && 'parentElement' in current) {
-        current = (current as any).parentElement;
-      } else if (current && (current as any).parentNode) {
-        current = (current as any).parentNode;
+        current = (current as unknown).parentElement;
+      } else if (current && (current as unknown).parentNode) {
+        current = (current as unknown).parentNode;
       } else {
         break;
       }

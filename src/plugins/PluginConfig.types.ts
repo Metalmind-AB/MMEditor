@@ -3,7 +3,7 @@ import { Plugin } from './types';
 /**
  * Configuration for individual plugin instances
  */
-export interface PluginConfig<TOptions = any> {
+export interface PluginConfig<TOptions = unknown> {
   /** The plugin instance or plugin factory function */
   plugin: Plugin | ((options?: TOptions) => Plugin);
   
@@ -41,13 +41,13 @@ export function initializePlugins(configs?: PluginsConfig): Plugin[] {
 /**
  * Type guard to check if a value is a PluginConfig
  */
-export function isPluginConfig(value: any): value is PluginConfig {
+export function isPluginConfig(value: unknown): value is PluginConfig {
   return value && typeof value === 'object' && 'plugin' in value;
 }
 
 /**
  * Type guard to check if a value is a PluginsConfig array
  */
-export function isPluginsConfig(value: any): value is PluginsConfig {
+export function isPluginsConfig(value: unknown): value is PluginsConfig {
   return Array.isArray(value) && value.every(isPluginConfig);
 }

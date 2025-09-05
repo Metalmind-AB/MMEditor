@@ -143,7 +143,7 @@ describe('TableContextMenu', () => {
 
   describe('Event Handlers', () => {
     it('closes menu when clicking outside', async () => {
-      const { container } = render(
+      render(
         <div>
           <TableContextMenu {...defaultProps} />
           <div data-testid="outside">Outside Element</div>

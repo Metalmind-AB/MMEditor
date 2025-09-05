@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '../../test/test-utils';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { render, screen, fireEvent } from '../../test/test-utils';
 import { Toolbar } from './Toolbar';
 import { Format, EditorInstance } from '../Editor/Editor.types';
 import { pluginRegistry } from '../../plugins/PluginRegistry';
@@ -237,7 +237,7 @@ describe('Toolbar Component', () => {
         removeAllRanges: vi.fn(),
         addRange: vi.fn(),
       };
-      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as any);
+      vi.spyOn(window, 'getSelection').mockReturnValue(mockSelection as unknown);
       
       render(<Toolbar {...defaultProps} config={tableConfig} />);
       

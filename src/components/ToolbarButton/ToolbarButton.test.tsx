@@ -97,7 +97,7 @@ describe('ToolbarButton Component', () => {
       render(<ToolbarButton {...defaultProps} />);
       
       const button = screen.getByRole('button');
-      const clickEvent = fireEvent.click(button);
+      fireEvent.click(button);
       
       // Button should prevent default behavior
       expect(button).toHaveAttribute('type', 'button');
@@ -194,7 +194,7 @@ describe('ToolbarButton Component', () => {
     it('handles missing tooltip gracefully', () => {
       const propsWithoutTooltip = {
         ...defaultProps,
-        tooltip: undefined as any,
+        tooltip: undefined as unknown,
       };
       
       expect(() => {

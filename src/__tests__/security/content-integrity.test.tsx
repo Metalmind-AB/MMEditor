@@ -111,8 +111,8 @@ describe('Content Integrity Tests', () => {
       }).not.toThrow();
       
       // Should not pollute prototypes
-      expect((Object.prototype as any).polluted).toBeUndefined();
-      expect((Array.prototype as any).polluted).toBeUndefined();
+      expect((Object.prototype as unknown).polluted).toBeUndefined();
+      expect((Array.prototype as unknown).polluted).toBeUndefined();
     });
   });
 

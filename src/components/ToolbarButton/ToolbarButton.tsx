@@ -13,7 +13,7 @@ interface ToolbarButtonProps {
 }
 
 export const ToolbarButton: React.FC<ToolbarButtonProps> = ({
-  format,
+  format: _format,
   icon,
   tooltip,
   isActive,

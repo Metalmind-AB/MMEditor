@@ -51,7 +51,7 @@ export class CodeManager {
    */
   static toggleCodeBlock(): void {
     // For now, fallback to inline code since full code blocks aren't implemented
-    this.toggleInlineCode();
+    CodeManager.toggleInlineCode();
   }
 
   /**
@@ -61,9 +61,9 @@ export class CodeManager {
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return;
 
-    if (this.isInInlineCode()) {
+    if (CodeManager.isInInlineCode()) {
       // Remove code formatting by unwrapping the code element
-      const codeElement = this.findParentElement(selection.anchorNode, 'CODE');
+      const codeElement = CodeManager.findParentElement(selection.anchorNode, 'CODE');
       if (codeElement && codeElement.parentNode) {
         // Save selection position
         const range = selection.getRangeAt(0);
@@ -109,7 +109,7 @@ export class CodeManager {
    * Handle special behavior in code blocks
    */
   static handleKeyInCodeBlock(event: KeyboardEvent): boolean {
-    if (!this.isInCodeBlock()) return false;
+    if (!CodeManager.isInCodeBlock()) return false;
 
     // Prevent auto-formatting shortcuts in code blocks
     if (event.ctrlKey || event.metaKey) {
@@ -143,7 +143,7 @@ export class CodeManager {
    * Handle paste in code blocks
    */
   static handlePasteInCodeBlock(event: ClipboardEvent): boolean {
-    if (!this.isInCodeBlock()) return false;
+    if (!CodeManager.isInCodeBlock()) return false;
 
     event.preventDefault();
     
@@ -151,7 +151,7 @@ export class CodeManager {
     const text = event.clipboardData?.getData('text/plain') || '';
     
     // Preserve formatting but escape HTML entities
-    const escapedText = this.escapeHtml(text);
+    const escapedText = CodeManager.escapeHtml(text);
     
     // Insert the text preserving whitespace
     document.execCommand('insertHTML', false, escapedText);
@@ -201,7 +201,7 @@ export class CodeManager {
    * Handle copy from code block
    */
   static handleCopyFromCodeBlock(event: ClipboardEvent): boolean {
-    if (!this.isInCodeBlock()) return false;
+    if (!CodeManager.isInCodeBlock()) return false;
 
     const selection = window.getSelection();
     if (!selection || selection.rangeCount === 0) return false;
@@ -210,7 +210,7 @@ export class CodeManager {
     
     // Set both plain text and HTML formats
     event.clipboardData?.setData('text/plain', selectedText);
-    event.clipboardData?.setData('text/html', `<pre><code>${this.escapeHtml(selectedText)}</code></pre>`);
+    event.clipboardData?.setData('text/html', `<pre><code>${CodeManager.escapeHtml(selectedText)}</code></pre>`);
     
     event.preventDefault();
     return true;

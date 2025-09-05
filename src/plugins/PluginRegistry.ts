@@ -2,7 +2,8 @@
  * Plugin Registry - Manages plugin registration and lifecycle
  */
 
-import { Plugin, PluginRegistry as IPluginRegistry } from './types';
+import React from 'react';
+import { Plugin, PluginRegistry as IPluginRegistry, PluginCommand } from './types';
 import { EditorInstance } from '../components/Editor/Editor.types';
 
 class PluginRegistryImpl implements IPluginRegistry {
@@ -332,8 +333,8 @@ class PluginRegistryImpl implements IPluginRegistry {
   /**
    * Get toolbar items from all enabled plugins
    */
-  getToolbarItems(): any[] {
-    const items: any[] = [];
+  getToolbarItems(): unknown[] {
+    const items: unknown[] = [];
 
     for (const plugin of this.plugins.values()) {
       if (this.enabledPlugins.has(plugin.name) && plugin.toolbarItems) {
@@ -372,7 +373,7 @@ class PluginRegistryImpl implements IPluginRegistry {
   /**
    * Get commands from all enabled plugins
    */
-  getCommands(): Map<string, any> {
+  getCommands(): Map<string, PluginCommand> {
     const commands = new Map();
 
     for (const plugin of this.plugins.values()) {

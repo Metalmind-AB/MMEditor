@@ -7,7 +7,7 @@ export type OpType = 'insert' | 'delete' | 'retain' | 'format';
 export interface Op {
   type: OpType;
   value?: string | number;
-  attributes?: Record<string, any>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface Delta {
@@ -98,7 +98,7 @@ export class DocumentModel {
         const tagName = element.tagName.toLowerCase();
         
         // Track formatting attributes
-        const attributes: Record<string, any> = {};
+        const attributes: Record<string, unknown> = {};
         
         switch (tagName) {
           case 'b':

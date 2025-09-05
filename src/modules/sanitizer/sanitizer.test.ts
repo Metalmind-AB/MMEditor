@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { sanitizer } from './sanitizer';
 
 describe('HTMLSanitizer', () => {
@@ -349,8 +349,8 @@ describe('HTMLSanitizer', () => {
   describe('DOM-based Attribute Sanitization (Browser Environment)', () => {
     it('removes disallowed attributes in DOM mode', () => {
       // Force DOM environment by mocking document
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<p data-dangerous="value" onclick="alert(1)" class="safe">Text</p>';
       const result = sanitizer.sanitize(html);
@@ -360,12 +360,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('onclick');
       
       // Restore original state
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('sanitizes href attributes in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<a href="javascript:alert(1)" class="link">Link</a>';
       const result = sanitizer.sanitize(html);
@@ -373,12 +373,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('href="javascript:alert(1)"');
       expect(result).toContain('class="link"');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('sanitizes src attributes in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<img src="data:text/html,<script>alert(1)</script>" alt="test">';
       const result = sanitizer.sanitize(html);
@@ -386,12 +386,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('src="data:');
       expect(result).toContain('alt="test"');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('sanitizes style attributes in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<p style="color: red; position: absolute; background: expression(alert(1))">Text</p>';
       const result = sanitizer.sanitize(html);
@@ -400,12 +400,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('position: absolute');
       expect(result).not.toContain('expression');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('handles target attribute validation in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<a href="https://example.com" target="_malicious">Link</a>';
       const result = sanitizer.sanitize(html);
@@ -413,12 +413,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('target="_malicious"');
       expect(result).toContain('href="https://example.com"');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('adds rel="noopener noreferrer" to target="_blank" links in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<a href="https://example.com" target="_blank">Link</a>';
       const result = sanitizer.sanitize(html);
@@ -426,12 +426,12 @@ describe('HTMLSanitizer', () => {
       expect(result).toContain('target="_blank"');
       expect(result).toContain('rel="noopener noreferrer"');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('preserves valid target="_self" in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<a href="https://example.com" target="_self">Link</a>';
       const result = sanitizer.sanitize(html);
@@ -439,12 +439,12 @@ describe('HTMLSanitizer', () => {
       expect(result).toContain('target="_self"');
       expect(result).not.toContain('rel="noopener noreferrer"');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('removes attributes with JavaScript in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<div title="eval(alert(1))" class="safe" data-value="javascript:void(0)">Content</div>';
       const result = sanitizer.sanitize(html);
@@ -453,12 +453,12 @@ describe('HTMLSanitizer', () => {
       expect(result).not.toContain('title="eval');
       expect(result).not.toContain('data-value');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
 
     it('removes empty style attributes in DOM mode', () => {
-      const originalIsTestEnv = (sanitizer as any).isTestEnvironment;
-      (sanitizer as any).isTestEnvironment = false;
+      const originalIsTestEnv = (sanitizer as unknown).isTestEnvironment;
+      (sanitizer as unknown).isTestEnvironment = false;
       
       const html = '<p style="position: absolute; z-index: 999">Text</p>';
       const result = sanitizer.sanitize(html);
@@ -466,7 +466,7 @@ describe('HTMLSanitizer', () => {
       // Should remove style attribute entirely if no allowed properties remain
       expect(result).not.toContain('style=');
       
-      (sanitizer as any).isTestEnvironment = originalIsTestEnv;
+      (sanitizer as unknown).isTestEnvironment = originalIsTestEnv;
     });
   });
 
@@ -477,13 +477,13 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       expect(result).toBe('&<>"\' ');
       
       // Restore document
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('handles numeric HTML entities', () => {
@@ -491,12 +491,12 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail to force manual path
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       expect(result).toBe('Hello World!\n');
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('handles hexadecimal HTML entities', () => {
@@ -504,12 +504,12 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail to force manual path
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       expect(result).toBe('Hello!');
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('handles mixed entity types', () => {
@@ -517,12 +517,12 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail to force manual path
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       expect(result).toBe('<p>Hello World!</p>');
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('handles malformed entities gracefully', () => {
@@ -530,14 +530,14 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail to force manual path
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       // Should handle valid entities and leave malformed ones as-is
       expect(result).toContain('&');
       expect(result).toContain('<');
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('handles empty DOM result by falling back to manual method', () => {
@@ -549,7 +549,7 @@ describe('HTMLSanitizer', () => {
           textContent: '',
           innerText: ''
         };
-        return mockDiv as any;
+        return mockDiv as unknown;
       });
       
       const text = '&amp;&lt;&gt;';
@@ -564,27 +564,27 @@ describe('HTMLSanitizer', () => {
       
       // Mock DOM to fail to force manual path
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const result = sanitizer.constructor.unescapeHtml(text);
       expect(result).toContain('A'); // Should contain the 'A' character
       expect(result).toContain('€'); // Should contain the Euro symbol
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
   });
 
   describe('DOM Availability Detection', () => {
     it('detects when DOM is unavailable', () => {
       const originalDocument = global.document;
-      delete (global as any).document;
+      delete (global as unknown).document;
       
       const html = '<p>Test</p>';
       const result = sanitizer.sanitize(html);
       // Should still work with parser-based sanitization
       expect(result).toBe('<p>Test</p>');
       
-      (global as any).document = originalDocument;
+      (global as unknown).document = originalDocument;
     });
 
     it('detects when DOM createElement throws error', () => {

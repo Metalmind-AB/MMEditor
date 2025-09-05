@@ -1,4 +1,4 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { render, RenderOptions } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -66,7 +66,7 @@ export const performanceUtils = {
   /**
    * Measure operation time
    */
-  measureTime: async (operation: () => any) => {
+  measureTime: async (operation: () => unknown) => {
     const startTime = performance.now();
     const result = await operation();
     const endTime = performance.now();
@@ -78,7 +78,7 @@ export const performanceUtils = {
    */
   getMemoryUsage: () => {
     if ('memory' in performance) {
-      return (performance as any).memory.usedJSHeapSize;
+      return (performance as unknown).memory.usedJSHeapSize;
     }
     return 0;
   },
@@ -107,7 +107,7 @@ export const securityUtils = {
   /**
    * Check if content is sanitized
    */
-  isSanitized: (html: string, payload: string) => {
+  isSanitized: (html: string, _payload: string) => {
     const dangerousPatterns = [
       'javascript:',
       'onclick=',
@@ -196,6 +196,7 @@ export const mockUtils = {
 };
 
 // Re-export everything from @testing-library/react
+// eslint-disable-next-line react-refresh/only-export-components
 export * from '@testing-library/react';
 
 // Override render with custom version

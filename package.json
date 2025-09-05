@@ -7,9 +7,9 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/mmeditor.es.js",
-      "require": "./dist/mmeditor.umd.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/mmeditor.umd.js"
     },
     "./dist/*": "./dist/*",
     "./style.css": "./dist/style.css"
@@ -31,11 +31,11 @@
     "test:unit": "vitest run",
     "test:coverage": "vitest run --coverage",
     "test:watch": "vitest",
+    "test:security": "vitest run -t 'Security|XSS|sanitiz'",
+    "test:performance": "vitest run -t 'Performance|performance'",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:security": "vitest run --grep \"Security|XSS|sanitiz\"",
-    "test:performance": "vitest run --grep \"Performance|performance\"",
     "test:all": "npm run test:unit && npm run test:e2e",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "typecheck": "tsc --noEmit",
@@ -55,18 +55,16 @@
     "react": ">=16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
     "react-dom": ">=16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
   },
-  "dependencies": {
+  "dependencies": {},
+  "devDependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@mui/icons-material": "^7.3.2",
-    "lucide-react": "^0.542.0"
-  },
-  "devDependencies": {
     "@eslint/js": "^9.34.0",
     "@fortawesome/fontawesome-svg-core": "^7.0.1",
     "@fortawesome/free-solid-svg-icons": "^7.0.1",
     "@fortawesome/react-fontawesome": "^3.0.2",
     "@heroicons/react": "^2.2.0",
+    "@mui/icons-material": "^7.3.2",
     "@mui/joy": "^5.0.0-beta.52",
     "@playwright/test": "^1.55.0",
     "@testing-library/jest-dom": "^6.8.0",
@@ -86,8 +84,12 @@
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
     "jsdom": "^26.1.0",
+    "lucide-react": "^0.542.0",
     "prettier": "^3.6.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.8.2",
     "terser": "^5.44.0",
     "typescript": "^5.9.2",
     "vite": "^7.1.4",

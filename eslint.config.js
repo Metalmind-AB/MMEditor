@@ -24,6 +24,17 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.es2020,
+        // Vitest globals
+        vi: 'readonly',
+        describe: 'readonly',
+        it: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        test: 'readonly',
+        suite: 'readonly',
       },
     },
     plugins: {
@@ -45,7 +56,10 @@ export default [
         argsIgnorePattern: '^_',
         varsIgnorePattern: '^_',
       }],
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': ['warn', {
+        fixToUnknown: true,
+        ignoreRestArgs: false,
+      }],
     },
     settings: {
       react: {

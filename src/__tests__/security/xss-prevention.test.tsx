@@ -190,7 +190,7 @@ describe('XSS Prevention Tests', () => {
         getData: vi.fn(() => '<script>alert("paste-xss")</script><p>Pasted</p>')
       };
       
-      const pasteEvent = new Event('paste') as any;
+      const pasteEvent = new Event('paste') as unknown;
       pasteEvent.clipboardData = clipboardData;
       
       fireEvent(editor, pasteEvent);

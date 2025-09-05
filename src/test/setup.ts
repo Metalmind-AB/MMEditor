@@ -9,12 +9,12 @@ document.execCommand = vi.fn((command: string, _showUI?: boolean, value?: string
 });
 
 // Mock document.queryCommandState for testing
-document.queryCommandState = vi.fn((command: string) => {
+document.queryCommandState = vi.fn((_command: string) => {
   return false;
 });
 
 // Mock document.queryCommandValue for testing
-document.queryCommandValue = vi.fn((command: string) => {
+document.queryCommandValue = vi.fn((_command: string) => {
   return '';
 });
 
@@ -24,7 +24,7 @@ window.getSelection = vi.fn(() => ({
   getRangeAt: vi.fn(),
   removeAllRanges: vi.fn(),
   addRange: vi.fn(),
-} as any));
+} as unknown));
 
 // Note: Commenting out the createElement override as it might be interfering with React rendering
 // This was causing text content to not be properly rendered in spans
@@ -74,4 +74,4 @@ document.createRange = vi.fn(() => ({
     setEnd: vi.fn(),
     collapse: vi.fn()
   }))
-} as any));
+} as unknown));

@@ -2,7 +2,8 @@
  * Plugin System Types and Interfaces
  */
 
-import { EditorInstance, Format } from '../components/Editor/Editor.types';
+import React from 'react';
+import { EditorInstance } from '../components/Editor/Editor.types';
 
 /**
  * Plugin metadata
@@ -36,7 +37,7 @@ export interface PluginFormatDefinition {
   tag?: string;
   className?: string;
   style?: React.CSSProperties;
-  apply: (editor: EditorInstance, value?: any) => void;
+  apply: (editor: EditorInstance, value?: unknown) => void;
   remove: (editor: EditorInstance) => void;
   isActive: (editor: EditorInstance) => boolean;
 }
@@ -46,7 +47,7 @@ export interface PluginFormatDefinition {
  */
 export interface PluginCommand {
   name: string;
-  execute: (editor: EditorInstance, ...args: any[]) => void;
+  execute: (editor: EditorInstance, ...args: unknown[]) => void;
   canExecute?: (editor: EditorInstance) => boolean;
   shortcut?: string;
 }
@@ -71,7 +72,7 @@ export type PluginEventType =
  */
 export interface PluginEventHandler {
   event: PluginEventType;
-  handler: (editor: EditorInstance, data?: any) => void | boolean;
+  handler: (editor: EditorInstance, data?: unknown) => void | boolean;
   priority?: number;
 }
 
@@ -145,7 +146,7 @@ export interface Plugin extends PluginMeta, PluginLifecycle {
   /**
    * Custom configuration
    */
-  config?: Record<string, any>;
+  config?: Record<string, unknown>;
   
   /**
    * Enable/disable plugin
@@ -156,7 +157,7 @@ export interface Plugin extends PluginMeta, PluginLifecycle {
 /**
  * Plugin constructor type
  */
-export type PluginConstructor = new (config?: any) => Plugin;
+export type PluginConstructor = new (config?: unknown) => Plugin;
 
 /**
  * Plugin registry interface
