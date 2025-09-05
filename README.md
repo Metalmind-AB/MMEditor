@@ -30,10 +30,42 @@ function MyApp() {
 - React 18+
 - TypeScript 5+ (recommended)
 - Node.js 18+
+- Git (required for GitHub installation)
 
 ### Installation
+
+#### From NPM (when published)
 ```bash
 npm install @mmeditor/core
+```
+
+#### From GitHub Repository
+```bash
+# Requires git to be installed
+npm install github:Metalmind-AB/MMEditor
+```
+
+#### From GitHub Release (no git required)
+```bash
+# Direct tarball download - works without git
+npm install https://github.com/Metalmind-AB/MMEditor/releases/download/v0.1.3/mmeditor-core-0.1.0.tgz
+```
+
+#### Docker Installation
+When installing in Docker containers, ensure git is available:
+
+```dockerfile
+# For Alpine-based images
+RUN apk add --no-cache git
+RUN npm install
+
+# For Debian/Ubuntu-based images
+RUN apt-get update && apt-get install -y git
+RUN npm install
+
+# Alternative: Use release tarball (no git needed)
+# In package.json:
+"@mmeditor/core": "https://github.com/Metalmind-AB/MMEditor/releases/download/v0.1.3/mmeditor-core-0.1.0.tgz"
 ```
 
 ### Basic Integration
