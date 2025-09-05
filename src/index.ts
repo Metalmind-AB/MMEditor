@@ -13,3 +13,6 @@ export type { Plugin } from './plugins/types';
 // Plugin exports
 export { createIconPackPlugin, IconPackPresets } from './plugins/icon-pack/IconPackPlugin';
 export type { IconPackConfig, IconMapping } from './plugins/icon-pack/IconPackPlugin';
+
+// Emoji plugin exports
+export { createEmojiPlugin, EmojiPlugin } from './plugins/emoji/EmojiPlugin';

@@ -1,14 +1,11 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MMEditor } from '../../src';
+import { MMEditor, createEmojiPlugin, createIconPackPlugin } from '../../src';
 import type { EditorInstance } from '../../src';
-// Temporarily disabled EmojiPlugin due to import issues
-// import { createEmojiPlugin } from '../../src/plugins/emoji/EmojiPlugin';
-import { createIconPackPlugin } from '../../src/plugins/icon-pack/IconPackPlugin';
 import { muiIconConfig } from '../plugins';
 
 // Create plugins for this component
-// const emojiPlugin = createEmojiPlugin();
+const emojiPlugin = createEmojiPlugin();
 const iconPackPlugin = createIconPackPlugin();
 
 export function FullFeatured() {
@@ -65,7 +62,7 @@ const editor = new MMEditor({
   
   // Create plugins array based on current settings
   const activePlugins = useMemo(() => {
-    const plugins = []; // Temporarily disabled emojiPlugin
+    const plugins = [emojiPlugin];
     if (selectedIconPack === 'mui') {
       plugins.push(iconPackPlugin);
     }
@@ -195,7 +192,7 @@ const editor = new MMEditor({
   value={content}
   onChange={setContent}
   placeholder="Start typing..."
-  plugins={[iconPackPlugin]} // Temporarily removed emojiPlugin
+  plugins={[emojiPlugin, iconPackPlugin]}
   config={{
     features: {
       tables: true,
