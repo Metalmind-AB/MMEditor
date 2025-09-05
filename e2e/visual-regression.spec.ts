@@ -156,6 +156,11 @@ test.describe('Cross-browser Visual Consistency', () => {
 
 // Performance visual tests
 test.describe('Performance Visual Tests', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/basic');
+    await page.waitForSelector('[role="textbox"]');
+  });
+
   test('large content rendering', async ({ page }) => {
     const editor = page.locator('[role="textbox"]');
     
