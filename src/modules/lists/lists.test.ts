@@ -676,7 +676,8 @@ describe('ListManager', () => {
       } as unknown as Selection));
 
       const result = ListManager.handleBackspaceInList(mockEvent);
-      expect(result).toBe(true); // Should allow default backspace behavior
+      // Returns false to let browser handle merging with previous item
+      expect(result).toBe(false);
       expect(mockEvent.preventDefault).not.toHaveBeenCalled();
     });
 
@@ -689,15 +690,14 @@ describe('ListManager', () => {
       const mockList = {
         tagName: 'UL',
         children: [],
-        remove: vi.fn(),
         parentElement: document.body
       };
 
       const mockListItem = {
         tagName: 'LI',
         parentElement: mockList,
-        previousElementSibling: null, // No previous sibling (first item)
-        remove: vi.fn()
+        previousElementSibling: null // No previous sibling (first item)
+        // No remove function - triggers mock environment path (execCommand outdent)
       };
 
       window.getSelection = vi.fn(() => ({
@@ -711,6 +711,7 @@ describe('ListManager', () => {
       const result = ListManager.handleBackspaceInList(mockEvent);
       expect(result).toBe(true);
       expect(mockEvent.preventDefault).toHaveBeenCalled();
+      expect(document.execCommand).toHaveBeenCalledWith('outdent', false, undefined);
     });
   });
 

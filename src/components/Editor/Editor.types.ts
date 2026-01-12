@@ -18,24 +18,26 @@ export interface MMEditorProps {
   onReady?: () => void;
 }
 
-export type Format = 
-  | 'bold' 
-  | 'italic' 
-  | 'underline' 
+export type Format =
+  | 'bold'
+  | 'italic'
+  | 'underline'
   | 'strike'
-  | 'h1' 
-  | 'h2' 
-  | 'h3' 
-  | 'h4' 
-  | 'h5' 
+  | 'h1'
+  | 'h2'
+  | 'h3'
+  | 'h4'
+  | 'h5'
   | 'h6'
-  | 'bullet' 
+  | 'bullet'
   | 'number'
   | 'code'
   | 'code-block' // Deprecated: use 'code' instead
-  | 'link' 
+  | 'link'
   | 'table'
-  | 'clear'; // Deprecated: each format should toggle on/off
+  | 'clear' // Deprecated: each format should toggle on/off
+  | 'undo'
+  | 'redo';
 
 export interface ToolbarConfig {
   groups?: ToolbarGroup[];
@@ -85,6 +87,14 @@ export interface EditorInstance {
   unregisterPlugin(pluginName: string): void;
   getPlugin(pluginName: string): Plugin | undefined;
   executeCommand(commandName: string, ...args: unknown[]): void;
+  /** Undo the last change */
+  undo(): void;
+  /** Redo the last undone change */
+  redo(): void;
+  /** Returns true if there are changes that can be undone */
+  canUndo(): boolean;
+  /** Returns true if there are changes that can be redone */
+  canRedo(): boolean;
 }
 
 export interface SelectionRange {

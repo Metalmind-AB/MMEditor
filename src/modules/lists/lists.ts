@@ -171,7 +171,7 @@ export class ListManager {
 
     // Check if we're at the start of a list item (offset 0)
     if (selection.anchorOffset !== 0) return false;
-    
+
     const anchorNode = selection.anchorNode;
     if (!anchorNode) return false;
 
@@ -179,14 +179,16 @@ export class ListManager {
     if (!listItem) return false;
 
     const previousItem = listItem.previousElementSibling;
-    
-    // If first item in list, exit the list
+
+    // If first item in list, exit the list (convert to paragraph)
     if (!previousItem) {
       event.preventDefault();
       return this.exitList(listItem);
     }
 
-    return true;
+    // If there's a previous item, let the browser handle merging
+    // by NOT preventing default and returning false
+    return false;
   }
 
   /**
@@ -237,12 +239,19 @@ export class ListManager {
     }
 
     const paragraph = document.createElement('p');
-    paragraph.innerHTML = '&nbsp;';
 
-    // Insert paragraph after list
-    list.parentElement?.insertBefore(paragraph, list.nextSibling);
+    // Preserve the content from the list item
+    const content = listItem.innerHTML;
+    if (content && content.trim() && content !== '<br>' && content !== '<br/>' && content !== '<br />') {
+      paragraph.innerHTML = content;
+    } else {
+      paragraph.innerHTML = '<br>';
+    }
 
-    // Remove empty list item
+    // Insert paragraph before the list (since we're removing the first item)
+    list.parentElement?.insertBefore(paragraph, list);
+
+    // Remove the list item
     listItem.remove();
 
     // If list is now empty, remove it
@@ -250,11 +259,20 @@ export class ListManager {
       list.remove();
     }
 
-    // Move cursor to new paragraph
+    // Move cursor to the beginning of the new paragraph
     const range = document.createRange();
-    range.setStart(paragraph, 0);
+    const firstChild = paragraph.firstChild;
+    if (firstChild) {
+      if (firstChild.nodeType === Node.TEXT_NODE) {
+        range.setStart(firstChild, 0);
+      } else {
+        range.setStart(paragraph, 0);
+      }
+    } else {
+      range.setStart(paragraph, 0);
+    }
     range.collapse(true);
-    
+
     const selection = window.getSelection();
     selection?.removeAllRanges();
     selection?.addRange(range);

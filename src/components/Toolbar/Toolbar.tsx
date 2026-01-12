@@ -12,6 +12,8 @@ interface ToolbarProps {
   activeFormats: Set<Format>;
   onFormat: (format: Format, value?: unknown) => void;
   editorInstance: EditorInstance;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 const formatIcons: Record<Format, string> = {
@@ -32,6 +34,8 @@ const formatIcons: Record<Format, string> = {
   link: '🔗',
   table: '⊞',
   clear: '✕', // Deprecated
+  undo: '↩',
+  redo: '↪',
 };
 
 const formatTooltips: Record<Format, string> = {
@@ -48,10 +52,12 @@ const formatTooltips: Record<Format, string> = {
   bullet: 'Bullet List',
   number: 'Numbered List',
   code: 'Code',
-  'code-block': 'Code Block (Deprecated)', 
+  'code-block': 'Code Block (Deprecated)',
   link: 'Insert Link (Ctrl+K)',
   table: 'Insert Table',
   clear: 'Clear Formatting (Deprecated)',
+  undo: 'Undo (Ctrl+Z)',
+  redo: 'Redo (Ctrl+Shift+Z)',
 };
 
 const headingOptions: DropdownOption[] = [
@@ -69,6 +75,8 @@ export const Toolbar: React.FC<ToolbarProps> = ({
   activeFormats,
   onFormat,
   editorInstance,
+  canUndo,
+  canRedo,
 }) => {
   const [currentBlockFormat, setCurrentBlockFormat] = useState<string>('p');
   const [showTablePicker, setShowTablePicker] = useState(false);
@@ -133,6 +141,21 @@ export const Toolbar: React.FC<ToolbarProps> = ({
         return (
           <div key={group.name} className={styles.group}>
             {group.items.map((format) => {
+              // Special handling for undo/redo buttons
+              if (format === 'undo' || format === 'redo') {
+                const isDisabled = format === 'undo' ? !canUndo : !canRedo;
+                return (
+                  <ToolbarButton
+                    key={format}
+                    format={format}
+                    icon={formatIcons[format]}
+                    tooltip={formatTooltips[format]}
+                    isActive={false}
+                    disabled={isDisabled}
+                    onClick={() => onFormat(format)}
+                  />
+                );
+              }
               if (format === 'table') {
                 return (
                   <div key={format} className={styles.tableButtonWrapper} ref={tableButtonRef}>

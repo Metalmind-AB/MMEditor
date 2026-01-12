@@ -16,12 +16,14 @@ import { ListManager } from '../../modules/lists/lists';
 import { CodeManager } from '../../modules/code/code';
 import { TableManager } from '../../modules/table/table';
 import { sanitizer, HTMLSanitizer } from '../../modules/sanitizer/sanitizer';
+import { HistoryManager } from '../../modules/history/history';
 import { useDebounce } from '../../hooks/useDebounce';
 import { pluginRegistry } from '../../plugins/PluginRegistry';
 import styles from './Editor.module.css';
 
 const defaultToolbarConfig = {
   groups: [
+    { name: 'history', items: ['undo', 'redo'] as Format[] },
     { name: 'text', items: ['bold', 'italic', 'underline', 'strike', 'code'] as Format[] },
     { name: 'heading', items: ['h1', 'h2', 'h3'] as Format[] },
     { name: 'list', items: ['bullet', 'number'] as Format[] },
@@ -57,6 +59,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
     const lastHtmlRef = useRef<string>('');
     const savedSelection = useRef<Range | null>(null);
+    const [canUndo, setCanUndo] = useState(false);
+    const [canRedo, setCanRedo] = useState(false);
+    const historyRef = useRef<HistoryManager | null>(null);
+    const isRestoringFromHistoryRef = useRef(false);
 
     const getHTML = useCallback((): string => {
       if (!editorRef.current) return '';
@@ -154,8 +160,25 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     // We need to use a ref to avoid circular dependency issues
     const handleLinkFormatRef = useRef<(() => void) | undefined>(undefined);
     
+    // Refs for undo/redo to avoid circular dependency
+    const performUndoRef = useRef<(() => void) | null>(null);
+    const performRedoRef = useRef<(() => void) | null>(null);
+
     const format = useCallback((formatName: string, _value?: unknown): void => {
+      // Capture HTML before format operation for history
+      const beforeHtml = getHTML();
+
       switch (formatName) {
+        case 'undo':
+          if (performUndoRef.current) {
+            performUndoRef.current();
+          }
+          return; // Don't push to history for undo
+        case 'redo':
+          if (performRedoRef.current) {
+            performRedoRef.current();
+          }
+          return; // Don't push to history for redo
         case 'bold':
           execCommand('bold');
           break;
@@ -196,7 +219,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
           if (handleLinkFormatRef.current) {
             handleLinkFormatRef.current();
           }
-          break;
+          return; // Link dialog handles its own history
         case 'clear':
           // Deprecated - but kept for backwards compatibility
           execCommand('removeFormat');
@@ -205,7 +228,15 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
         default:
           break;
       }
-    }, [execCommand]);
+
+      // Push to history immediately after format operations
+      setTimeout(() => {
+        const afterHtml = getHTML();
+        if (afterHtml !== beforeHtml) {
+          historyRef.current?.pushImmediate(afterHtml);
+        }
+      }, 0);
+    }, [execCommand, getHTML]);
 
     const removeFormat = useCallback((): void => {
       execCommand('removeFormat');
@@ -281,25 +312,55 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     const updateActiveFormats = useCallback(() => {
       // Get selection without modifying it
       const selection = window.getSelection();
-      
+
       // Call plugin selection change hooks
       pluginRegistry.onSelectionChange(selection);
-      
+
       const formats = new Set<Format>();
       const allFormats: Format[] = [
         'bold', 'italic', 'underline', 'strike',
         'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
         'bullet', 'number', 'code'
       ];
-      
+
       allFormats.forEach(format => {
         if (isFormatActive(format)) {
           formats.add(format);
         }
       });
-      
+
       setActiveFormats(formats);
     }, [isFormatActive]);
+
+    const performUndo = useCallback(() => {
+      const entry = historyRef.current?.undo();
+      if (entry && editorRef.current) {
+        isRestoringFromHistoryRef.current = true;
+        const sanitizedHtml = sanitizer.sanitize(entry.html);
+        editorRef.current.innerHTML = sanitizedHtml;
+        lastHtmlRef.current = sanitizedHtml;
+        onChange?.(sanitizedHtml);
+        updateActiveFormats();
+        isRestoringFromHistoryRef.current = false;
+      }
+    }, [onChange, updateActiveFormats]);
+
+    const performRedo = useCallback(() => {
+      const entry = historyRef.current?.redo();
+      if (entry && editorRef.current) {
+        isRestoringFromHistoryRef.current = true;
+        const sanitizedHtml = sanitizer.sanitize(entry.html);
+        editorRef.current.innerHTML = sanitizedHtml;
+        lastHtmlRef.current = sanitizedHtml;
+        onChange?.(sanitizedHtml);
+        updateActiveFormats();
+        isRestoringFromHistoryRef.current = false;
+      }
+    }, [onChange, updateActiveFormats]);
+
+    // Assign to refs for use in format function
+    performUndoRef.current = performUndo;
+    performRedoRef.current = performRedo;
 
     const editorInstance: EditorInstance = useMemo(() => ({
       getHTML,
@@ -318,6 +379,10 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       unregisterPlugin,
       getPlugin,
       executeCommand,
+      undo: performUndo,
+      redo: performRedo,
+      canUndo: () => historyRef.current?.canUndo() ?? false,
+      canRedo: () => historyRef.current?.canRedo() ?? false,
     }), [
       getHTML,
       setHTML,
@@ -335,6 +400,8 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       unregisterPlugin,
       getPlugin,
       executeCommand,
+      performUndo,
+      performRedo,
     ]);
     
     // Store the instance in ref for executeCommand
@@ -353,11 +420,16 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     );
 
     const handleInput = useCallback(() => {
+      // Don't track input changes when we're restoring from history
+      if (isRestoringFromHistoryRef.current) {
+        return;
+      }
+
       const html = getHTML();
       if (html !== lastHtmlRef.current) {
         const oldContent = lastHtmlRef.current;
         const sanitizedHtml = sanitizer.sanitize(html);
-        
+
         // Call plugin beforeChange hooks
         const allowChange = pluginRegistry.beforeChange(oldContent, sanitizedHtml);
         if (!allowChange) {
@@ -365,22 +437,34 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
           setHTML(oldContent);
           return;
         }
-        
+
         // If content was sanitized (changed), update the DOM
         if (sanitizedHtml !== html) {
           setHTML(sanitizedHtml);
         }
-        
+
         lastHtmlRef.current = sanitizedHtml;
+
+        // Push to history (Word-style: accumulates until break point)
+        historyRef.current?.pushTyping(sanitizedHtml);
+
         debouncedOnChange?.(sanitizedHtml);
-        updateActiveFormats();
-        
+        // Note: Don't call updateActiveFormats() here - it's expensive and
+        // typing doesn't change formats. The selectionchange event handles it.
+
         // Call plugin afterChange hooks
         pluginRegistry.afterChange(sanitizedHtml);
       }
-    }, [getHTML, setHTML, debouncedOnChange, updateActiveFormats]);
+    }, [getHTML, setHTML, debouncedOnChange]);
 
     const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+      // Word-style undo: commit typing on break point keys
+      // Break points: Enter, Backspace, Delete, Arrow keys
+      const breakPointKeys = ['Enter', 'Backspace', 'Delete', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+      if (breakPointKeys.includes(e.key)) {
+        historyRef.current?.commitTyping();
+      }
+
       // Handle code block-specific keys first
       if (CodeManager.handleKeyInCodeBlock(e.nativeEvent)) {
         return;
@@ -421,6 +505,16 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
             break;
           case 'Backspace':
             if (ListManager.handleBackspaceInList(e.nativeEvent)) {
+              // List operation modified the DOM programmatically, so input event won't fire.
+              // We need to manually push the new state to history.
+              setTimeout(() => {
+                const newHtml = getHTML();
+                if (newHtml !== lastHtmlRef.current) {
+                  lastHtmlRef.current = newHtml;
+                  historyRef.current?.pushImmediate(newHtml);
+                  onChange?.(newHtml);
+                }
+              }, 0);
               return;
             }
             break;
@@ -449,17 +543,21 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
             }
             break;
           case 'z':
+            e.preventDefault();
             if (e.shiftKey) {
-              e.preventDefault();
-              // TODO: Implement redo
+              performRedoRef.current?.();
             } else {
-              e.preventDefault();
-              // TODO: Implement undo
+              performUndoRef.current?.();
             }
+            break;
+          case 'y':
+            // Windows redo shortcut (Ctrl+Y)
+            e.preventDefault();
+            performRedoRef.current?.();
             break;
         }
       }
-    }, [format]);
+    }, [format, getHTML, onChange]);
 
     const saveSelection = useCallback(() => {
       const selection = window.getSelection();
@@ -598,13 +696,16 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
     }, []);
 
     const handlePaste = useCallback((e: React.ClipboardEvent) => {
+      // Word-style undo: commit typing before paste (paste is a break point)
+      historyRef.current?.commitTyping();
+
       // Handle paste in code blocks specially
       if (CodeManager.handlePasteInCodeBlock(e.nativeEvent)) {
         return;
       }
-      
+
       e.preventDefault();
-      
+
       // Try to get HTML content first
       const html = e.clipboardData.getData('text/html');
       const text = e.clipboardData.getData('text/plain');
@@ -633,12 +734,38 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
       }
     }, [updateActiveFormats]);
 
+    // Word-style undo: commit typing when user clicks (mouse selection change)
+    const handleMouseDown = useCallback(() => {
+      historyRef.current?.commitTyping();
+    }, []);
+
     useEffect(() => {
       document.addEventListener('selectionchange', handleSelectionChange);
       return () => {
         document.removeEventListener('selectionchange', handleSelectionChange);
       };
     }, [handleSelectionChange]);
+
+    // Initialize HistoryManager
+    useEffect(() => {
+      historyRef.current = new HistoryManager(
+        editorRef,
+        () => {
+          setCanUndo(historyRef.current?.canUndo() ?? false);
+          setCanRedo(historyRef.current?.canRedo() ?? false);
+        }
+      );
+
+      // Push initial state to history
+      const initialHtml = editorRef.current?.innerHTML || '';
+      if (initialHtml) {
+        historyRef.current.pushImmediate(initialHtml);
+      }
+
+      return () => {
+        historyRef.current?.destroy();
+      };
+    }, []);
 
     useEffect(() => {
       if (isControlled && value !== undefined && value !== lastHtmlRef.current) {
@@ -699,6 +826,8 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
               activeFormats={activeFormats}
               onFormat={format}
               editorInstance={editorInstance}
+              canUndo={canUndo}
+              canRedo={canRedo}
             />
           )}
           <div
@@ -711,6 +840,7 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
             aria-multiline="true"
             onInput={handleInput}
             onKeyDown={handleKeyDown}
+            onMouseDown={handleMouseDown}
             onCopy={handleCopy}
             onPaste={handlePaste}
             onContextMenu={handleContextMenu}

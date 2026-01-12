@@ -22,6 +22,10 @@ describe('Toolbar Component', () => {
     unregisterPlugin: vi.fn(),
     getPlugin: vi.fn(),
     executeCommand: vi.fn(),
+    undo: vi.fn(),
+    redo: vi.fn(),
+    canUndo: vi.fn(() => false),
+    canRedo: vi.fn(() => false),
   };
 
   const defaultProps = {
@@ -35,6 +39,8 @@ describe('Toolbar Component', () => {
     activeFormats: new Set<Format>(),
     onFormat: vi.fn(),
     editorInstance: mockEditorInstance,
+    canUndo: false,
+    canRedo: false,
   };
 
   beforeEach(() => {
