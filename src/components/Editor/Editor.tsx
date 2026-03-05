@@ -441,15 +441,40 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
         // If content was sanitized (changed), update the DOM while
         // preserving the cursor position so typing isn't interrupted.
         if (sanitizedHtml !== html) {
+          // Save cursor as a text offset -- DOM node references won't
+          // survive the innerHTML replacement.
+          let cursorOffset: number | null = null;
           const sel = window.getSelection();
-          const savedRange = sel?.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
+          if (sel?.rangeCount && editorRef.current) {
+            const range = sel.getRangeAt(0);
+            const preRange = document.createRange();
+            preRange.selectNodeContents(editorRef.current);
+            preRange.setEnd(range.startContainer, range.startOffset);
+            cursorOffset = preRange.toString().length;
+          }
+
           setHTML(sanitizedHtml);
-          if (savedRange && sel) {
-            try {
-              sel.removeAllRanges();
-              sel.addRange(savedRange);
-            } catch {
-              // Range may be invalid after innerHTML replacement
+
+          // Restore cursor from text offset by walking the new DOM tree.
+          if (cursorOffset !== null && sel && editorRef.current) {
+            const walker = document.createTreeWalker(
+              editorRef.current,
+              NodeFilter.SHOW_TEXT,
+            );
+            let remaining = cursorOffset;
+            let node: Node | null = walker.nextNode();
+            while (node) {
+              const len = node.textContent?.length ?? 0;
+              if (remaining <= len) {
+                const newRange = document.createRange();
+                newRange.setStart(node, remaining);
+                newRange.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(newRange);
+                break;
+              }
+              remaining -= len;
+              node = walker.nextNode();
             }
           }
         }
