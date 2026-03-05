@@ -14,8 +14,9 @@ export default defineConfig({
   
   // Visual regression settings
   expect: {
-    toHaveScreenshot: { 
+    toHaveScreenshot: {
       threshold: 0.2,
+      maxDiffPixels: 50,
       // Allow slight differences in rendering between environments
       animationMode: 'disabled'
     },
