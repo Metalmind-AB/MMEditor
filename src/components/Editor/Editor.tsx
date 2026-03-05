@@ -769,6 +769,12 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
 
     useEffect(() => {
       if (isControlled && value !== undefined && value !== lastHtmlRef.current) {
+        // Skip innerHTML replacement while the user is actively typing --
+        // the editor already has the correct content from user input and
+        // clobbering it would destroy the browser selection/cursor position.
+        if (editorRef.current && editorRef.current.contains(document.activeElement)) {
+          return;
+        }
         setHTML(value);
       }
     }, [value, isControlled, setHTML]);
