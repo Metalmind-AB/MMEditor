@@ -438,9 +438,20 @@ export const Editor = forwardRef<EditorInstance, MMEditorProps>(
           return;
         }
 
-        // If content was sanitized (changed), update the DOM
+        // If content was sanitized (changed), update the DOM while
+        // preserving the cursor position so typing isn't interrupted.
         if (sanitizedHtml !== html) {
+          const sel = window.getSelection();
+          const savedRange = sel?.rangeCount ? sel.getRangeAt(0).cloneRange() : null;
           setHTML(sanitizedHtml);
+          if (savedRange && sel) {
+            try {
+              sel.removeAllRanges();
+              sel.addRange(savedRange);
+            } catch {
+              // Range may be invalid after innerHTML replacement
+            }
+          }
         }
 
         lastHtmlRef.current = sanitizedHtml;
