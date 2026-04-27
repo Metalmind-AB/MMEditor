@@ -240,7 +240,13 @@ export class DocumentModel {
       return null;
     }
 
-    const compact = link.replace(/[\u0000-\u001F\u007F\s]+/g, '').toLowerCase();
+    const compact = Array.from(link)
+      .filter((char) => {
+        const codePoint = char.codePointAt(0) ?? 0;
+        return codePoint > 0x1f && codePoint !== 0x7f && char.trim() !== '';
+      })
+      .join('')
+      .toLowerCase();
     if (
       compact.startsWith('javascript:') ||
       compact.startsWith('data:') ||
