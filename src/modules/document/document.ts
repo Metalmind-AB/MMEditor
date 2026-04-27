@@ -2,6 +2,8 @@
  * Document model - Delta-like operations for efficient document management
  */
 
+import { HTMLSanitizer, sanitizer } from '../sanitizer/sanitizer';
+
 export type OpType = 'insert' | 'delete' | 'retain' | 'format';
 
 export interface Op {
@@ -176,7 +178,7 @@ export class DocumentModel {
     
     delta.ops.forEach(op => {
       if (op.type === 'insert' && typeof op.value === 'string') {
-        let text = op.value;
+        let text = HTMLSanitizer.escapeHtml(op.value);
         const attrs = op.attributes || {};
         
         // Apply inline formats
@@ -185,11 +187,13 @@ export class DocumentModel {
         if (attrs.underline) text = `<u>${text}</u>`;
         if (attrs.strike) text = `<strike>${text}</strike>`;
         if (attrs.code) text = `<code>${text}</code>`;
-        if (attrs.link) text = `<a href="${attrs.link}">${text}</a>`;
+        const safeLink = this.normalizeLink(attrs.link);
+        if (safeLink) text = `<a href="${HTMLSanitizer.escapeHtml(safeLink)}">${text}</a>`;
         
         // Handle block formats
-        if (attrs.header) {
-          currentBlock = `h${attrs.header}`;
+        const headerLevel = this.normalizeHeaderLevel(attrs.header);
+        if (headerLevel) {
+          currentBlock = `h${headerLevel}`;
         } else if (attrs.codeBlock) {
           currentBlock = 'pre';
         } else if (!currentBlock) {
@@ -215,7 +219,52 @@ export class DocumentModel {
       html += `<${currentBlock}>${currentFormats.join('')}</${currentBlock}>`;
     }
     
-    return html;
+    return sanitizer.sanitize(html);
+  }
+
+  private normalizeHeaderLevel(value: unknown): number | null {
+    const level = Number(value);
+    if (!Number.isInteger(level) || level < 1 || level > 6) {
+      return null;
+    }
+    return level;
+  }
+
+  private normalizeLink(value: unknown): string | null {
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const link = value.trim();
+    if (!link) {
+      return null;
+    }
+
+    const compact = link.replace(/[\u0000-\u001F\u007F\s]+/g, '').toLowerCase();
+    if (
+      compact.startsWith('javascript:') ||
+      compact.startsWith('data:') ||
+      compact.startsWith('vbscript:') ||
+      compact.startsWith('file:') ||
+      compact.startsWith('about:')
+    ) {
+      return null;
+    }
+
+    if (link.startsWith('/') || link.startsWith('#')) {
+      return link;
+    }
+
+    try {
+      const parsed = new URL(link);
+      if (['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol)) {
+        return link;
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
   }
 
   /**

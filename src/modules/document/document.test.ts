@@ -165,6 +165,38 @@ describe('DocumentModel', () => {
       expect(html).toContain('<em>italic</em>');
     });
 
+    it('escapes inserted text when generating HTML from delta operations', () => {
+      document.applyOp({
+        type: 'insert',
+        value: '<img src=x onerror=alert(1)>',
+        attributes: { bold: true },
+      });
+
+      const html = document.getHTML();
+
+      expect(html).toContain('&lt;img src=x onerror=alert(1)&gt;');
+      expect(html).not.toContain('<img');
+    });
+
+    it('escapes link attributes and drops unsafe link protocols', () => {
+      document.applyOp({
+        type: 'insert',
+        value: 'quoted',
+        attributes: { link: 'https://example.com/?q=" onclick="alert(1)' },
+      });
+      document.applyOp({
+        type: 'insert',
+        value: 'blocked',
+        attributes: { link: 'javascript:alert(1)' },
+      });
+
+      const html = document.getHTML();
+
+      expect(html).toContain('href="https://example.com/?q=&quot; onclick=&quot;alert(1)"');
+      expect(html).toContain('>blocked</');
+      expect(html).not.toContain('javascript:');
+    });
+
     it('handles empty content', () => {
       document.setHTML('');
       expect(document.getHTML()).toBe('');
